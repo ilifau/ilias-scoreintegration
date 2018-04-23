@@ -40,7 +40,8 @@ class ilCodeQuestionESTIntegrationPageGUI
 
 		$this->plugin = ilPlugin::getPluginObject(IL_COMP_SERVICE, 'UIComponent', 'uihk', 'CodeQuestionESTIntegration');
 		$this->plugin->includeClass('class.ilCodeQuestionESTIntegration.php');
-
+		$this->plugin->loadLanguageModule();
+		
 		$this->testObj = new ilObjTest($_GET['ref_id']);
 		$this->estObj = new ilCodeQuestionESTIntegration($this->testObj, $this->plugin);
 	}
