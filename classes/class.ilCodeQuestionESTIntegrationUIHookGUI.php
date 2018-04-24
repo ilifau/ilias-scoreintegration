@@ -57,7 +57,7 @@ class ilCodeQuestionESTIntegrationUIHookGUI extends ilUIHookPluginGUI
 		// to determine the context.
 		if ($a_part == "tabs"){
 			// $a_par["tabs"] is ilTabsGUI object
-			if ($_GET["baseClass"] == 'ilObjTestGUI' || $_GET["baseClass"] == 'ilrepositorygui') 
+			if ($_GET["baseClass"] == 'ilObjTestGUI' || $_GET["baseClass"] == 'ilRepositoryGUI') 
 			{								
 				$ilCtrl->saveParameterByClass('ilCodeQuestionESTIntegrationPageGUI','ref_id');
 				$a_par["tabs"]->addTab("est_integration", $this->plugin_object->txt("est_integration"), $ilCtrl->getLinkTargetByClass(array('ilUIPluginRouterGUI','ilCodeQuestionESTIntegrationPageGUI'), 'showMainESTPage'));

@@ -108,9 +108,10 @@ class ilCodeQuestionESTIntegration
 			return "cannot open <$tempBase>\n";            
 		}
 
-		$tempBase = './EST';
+		$tempBase = sprintf('./EST/test-%06d', $this->testObj->getId());
+		
 		foreach($data->getParticipants() as $active_id => $userdata)
-		{
+		{			
 				// Do something with the participants				
 				$pass = $userdata->getScoredPass();
 				foreach($userdata->getQuestions($pass) as $question)
@@ -128,18 +129,53 @@ class ilCodeQuestionESTIntegration
 						$solution = $objQuestion->getExportSolution($active_id, $pass);
 						$code = $objQuestion->getCompleteSource($solution);
 
-						$subFolder = sprintf("%06d-%06d-%06d-%s", $solution['solution_id'], $solution['active_fi'], $userdata->user_id, $userdata->login);
+						$subFolder = sprintf("question-%06d-%06d-%06d-%s", $solution['solution_id'], $solution['active_fi'], $userdata->user_id, $userdata->login);
 						$subFolder = $questionBase.'/'.preg_replace('/[^A-Za-z0-9_\-]/', '', $subFolder);
 						$zip->addFromString($subFolder.'/'.$filename, $code);
+
+						
+						$feedback = $this->testObj->getManualFeedback(
+							$solution['active_fi'], 
+							$solution['question_fi'],
+							$solution["pass"]
+						);
+						$points = $this->getReachedPoints(
+							$solution['active_fi'], 
+							$solution['question_fi'],
+							$solution["pass"]
+						);
+
+						$comment = "POINTS: %3.1f\n%s\n";
+						$comment = sprintf($comment, $points, $feedback);						
+						$zip->addFromString($subFolder.'/comment_', $comment);
 					}
 				}
-				
 				// Access some user related properties
 				//$last_visited = $data->getParticipant($active_id)->getLastVisit();
 		}
 		$zip->close();
 
 		return NULL;
+	}
+
+	protected function getReachedPoints($active_fi, $question_fi, $pass){
+		global $ilDB;
+
+		$query = "SELECT * FROM tst_test_result WHERE " . 
+			'active_fi='. $ilDB->quote($active_fi,'integer') . " AND " . 
+			'question_fi='. $ilDB->quote($question_fi,'integer') . " AND " .
+			'pass='. $ilDB->quote($pass,'integer') . 
+			" ORDER BY active_fi";
+		
+		$result = $ilDB->query($query);
+		
+		
+		while ($row = $ilDB->fetchAssoc($result))
+		{
+			return $row['points'];
+		}
+
+		return 0;
 	}
 }
 
