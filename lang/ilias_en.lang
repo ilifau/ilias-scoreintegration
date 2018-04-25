@@ -1,3 +1,11 @@
 // English Language File for CodeQuestionESTIntegration Plugin
 <!-- language file start -->
 est_integration#:#EST Integration
+hide_all_details#:#Hide all details
+show_all_details#:#Show all details
+select_files_from_computer#:#Select the files from your computer
+drag_files_here#:#Drag-and-drop your files here
+selected_files#:#Selected files
+num_of_selected_files#:#%s file(s) selected
+logic_or#:#or
+file_notice#:#Maximum upload size:
