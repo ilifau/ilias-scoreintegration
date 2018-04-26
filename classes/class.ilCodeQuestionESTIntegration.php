@@ -99,6 +99,69 @@ class ilCodeQuestionESTIntegration
 		$scorer->setPreserveManualScores(true);
 		$scorer->recalculateSolutions();
 	}
+
+	function processZipFile($zipFile){
+		$zip = new ZipArchive();
+		$zip->open($zipFile);
+		$result = array(
+			"numberOfFiles" => $zip->numFiles,
+			"files" => array(),
+			"metaFiles" => array(),
+			"unparsableEntries" => array(),
+			"ignoredFiles" => array(),
+			"invalidComment" => array()
+		);
+		
+		for ($i=0; $i<$zip->numFiles;$i++) {
+			//echo "index: $i\n";
+			$item = $zip->statIndex($i);
+
+			$filePath = trim($item['name']);
+			if (substr( $filePath, 0, 9 ) == '__MACOSX/') {
+				$result['metaFiles'][] = $item['name'];
+				continue;
+			} else if (substr( $filePath, 0, 1 ) == '.' || !(strpos($filePath, '/.')===false)) {
+				$result['metaFiles'][] = $item['name'];
+				continue;
+			}
+
+			$matches = array();
+			preg_match_all(':test-([0-9]+)/question-([0-9]+)/solution-([0-9]+)-([0-9]+)-([0-9]+)-(.*)/(.*):', $filePath, $matches);
+			if (count($matches)!=8 || trim($matches[7][0])=='') {
+				$result['unparsableEntries'][] = $item['name'];
+				continue;
+			}			
+			$fileName = trim($matches[7][0]);
+
+			$obj = array(
+				"path" => $filePath,
+				"file" => $fileName,
+				"testID" => (int)$matches[1][0],
+				"questionID" => (int)$matches[2][0],
+				"solutionID" => (int)$matches[3][0],
+				"activeID" => (int)$matches[4][0],
+				"userID" => (int)$matches[5][0],
+				"login" => trim($matches[6][0])
+			);
+			if (strtolower($obj["file"]) == 'comment'){		
+				$obj['rawContent'] = $zip->getFromIndex($i);
+				preg_match_all('/.*\:\s*(-?[0-9]+(\.[0-9]+)?)\s*\n([\s\S]*)/', $obj['rawContent'], $matches);
+				//print_r($matches);
+				if (count($matches)!=4){
+					$result['invalidComment'][] = $obj;					
+				} else {
+					$obj['points'] = (float)$matches[1][0];
+					$obj['comment'] = $matches[3][0];
+					$result['files'][] = $obj;			
+				}
+			} else {
+				$result['ignoredFiles'][] = $obj;			
+			}
+		}
+		echo "numFile:" . $zip->numFiles . "\n";
+
+		return $result;
+	}
 	
 	function buildZIP($zipFile){
 		$data      = $this->testObj->getCompleteEvaluationData(TRUE);
@@ -116,7 +179,7 @@ class ilCodeQuestionESTIntegration
 				$pass = $userdata->getScoredPass();
 				foreach($userdata->getQuestions($pass) as $question)
 				{
-					$questionBase = $tempBase.'/'.sprintf("%06d", $question["id"]);					
+					$questionBase = $tempBase.'/'.sprintf("question-%06d", $question["id"]);					
 					$objQuestion = $questions[$question["id"]];
 					if (!$objQuestion){
 						$objQuestion = $this->testObj->_instanciateQuestion($question["id"]);
@@ -129,7 +192,7 @@ class ilCodeQuestionESTIntegration
 						$solution = $objQuestion->getExportSolution($active_id, $pass);
 						$code = $objQuestion->getCompleteSource($solution);
 
-						$subFolder = sprintf("question-%06d-%06d-%06d-%s", $solution['solution_id'], $solution['active_fi'], $userdata->user_id, $userdata->login);
+						$subFolder = sprintf("solution-%06d-%06d-%06d-%s", $solution['solution_id'], $solution['active_fi'], $userdata->user_id, $userdata->login);
 						$subFolder = $questionBase.'/'.preg_replace('/[^A-Za-z0-9_\-]/', '', $subFolder);
 						$zip->addFromString($subFolder.'/'.$filename, $code);
 

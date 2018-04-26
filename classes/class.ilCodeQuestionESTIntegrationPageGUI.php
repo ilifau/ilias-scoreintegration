@@ -88,20 +88,8 @@ class ilCodeQuestionESTIntegrationPageGUI
 					ilUtil::sendFailure($lng->txt('file_not_found'), true);
 					ilUtil::redirect("goto.php?target=tst_".$this->testObj->getRefId());
 				}
-
-				$za = new ZipArchive();
-				$za->open($file['tmp_name']);
-				echo "numFiles: " . $za->numFiles . "\n";
-				echo "status: " . $za->status  . "\n";
-				echo "statusSys: " . $za->statusSys . "\n";
-				echo "filename: " . $za->filename . "\n";
-				echo "comment: " . $za->comment . "\n";
-
-				for ($i=0; $i<$za->numFiles;$i++) {
-					echo "index: $i\n";
-					print_r($za->statIndex($i));
-				}
-				echo "numFile:" . $za->numFiles . "\n";
+				$result = $this->estObj->processZipFile($file['tmp_name']);
+				print_r($result);
 			}
 			print_r($_POST);
 			print_r($file);
@@ -255,70 +243,7 @@ class ilCodeQuestionESTIntegrationPageGUI
 		//echo $this->getFileUploadFormHTML()."<hr>";die;
 		//$upload = $this->getFileUploadForm();
 		$tpl->setVariable("FILE_UPLOAD", $this->getFileUploadForm()->getHTML());
-		// make sure jQuery is loaded
-		/*
-		iljQueryUtil::initjQuery();
-
-		$uniqueId = "ESTUpload";
-		$submit_button_name = "ESTSubmit";
-		$cancel_button_name = "ESTCancle";
-
-		ilFileUploadGUI::initFileUpload();
-		// load template
-		$formtpl = new ilTemplate("tpl.prop_dndfiles.html", true, true, "Services/Form");
-		$formtpl->setVariable("UPLOAD_ID", $uniqueId);
-
-		// input
-		$formtpl->setVariable("FILE_SELECT_ICON", ilObject::_getIcon("", "", "fold"));
-		$formtpl->setVariable("TXT_SHOW_ALL_DETAILS", $this->plugin->txt('show_all_details')); 
-		$formtpl->setVariable("TXT_HIDE_ALL_DETAILS", $this->plugin->txt('hide_all_details'));
-		$formtpl->setVariable("TXT_SELECTED_FILES", $this->plugin->txt('selected_files'));
-		$formtpl->setVariable("TXT_DRAG_FILES_HERE", $this->plugin->txt('drag_files_here'));
-		$formtpl->setVariable("TXT_NUM_OF_SELECTED_FILES", $this->plugin->txt('num_of_selected_files'));
-		$formtpl->setVariable("TXT_SELECT_FILES_FROM_COMPUTER", $this->plugin->txt('select_files_from_computer'));
-		$formtpl->setVariable("TXT_OR", $this->plugin->txt('logic_or'));
-		$formtpl->setVariable("INPUT_ACCEPT_SUFFIXES", array('zip'));
-
-		// info
-		$formtpl->setCurrentBlock("max_size");
-		$formtpl->setVariable("TXT_MAX_SIZE", $this->plugin->txt("file_notice")." ".$this->getMaxFileSizeString());
-		$formtpl->parseCurrentBlock();
-
-		// create file upload object		
-		$upload = new ilFileUploadGUI("ilFileUploadDropZone_" . $uniqueId, $uniqueId, false);
-		//$upload->enableFormSubmit("ilFileUploadInput_" . $uniqueId, $submit_button_name, $cancel_button_name);
-		$upload->setDropAreaId("ilFileUploadDropArea_" . $uniqueId);
-		$upload->setFileListId("ilFileUploadList_" . $uniqueId);
-		$upload->setFileSelectButtonId("ilFileUploadFileSelect_" . $uniqueId);
 		
-		
-		$formtpl->setVariable("FILE_UPLOAD", $upload->getHTML());
-		$tpl->setVariable("FILE_UPLOAD", $formtpl->get());
-		*/
-
-		/*foreach($data->getParticipants() as $active_id => $userdata)
-		{
-			// Do something with the participants				
-			$pass = $userdata->getScoredPass();
-			foreach($userdata->getQuestions($pass) as $question)
-			{
-				$objQuestion = $this->testObj->_instanciateQuestion($question["id"]);
-				$solution = $objQuestion->getExportSolution($active_id, $pass);
-				$this->estObj->updatePoints(
-					$solution['active_fi'], 
-					$solution['question_fi'], 
-					$solution['pass'], 
-					0.5, 
-					$question['points'],
-					'welcome');
-				print_r($solution);
-				print_r($question);
-				print_r($objQuestion);
-				print_r($ilDB);
-				die;
-			}
-}*/
-
 		return $tpl->get();					
 	}
 
