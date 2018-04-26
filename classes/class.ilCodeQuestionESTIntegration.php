@@ -119,7 +119,8 @@ class ilCodeQuestionESTIntegration
 			//echo "index: $i\n";
 			$item = $zip->statIndex($i);
 
-			$filePath = trim($item['name']);
+			$filePath = trim($item['name']).'';
+			
 			if (substr( $filePath, 0, 9 ) == '__MACOSX/') {
 				$result['metaFiles'][] = $item['name'];
 				continue;
