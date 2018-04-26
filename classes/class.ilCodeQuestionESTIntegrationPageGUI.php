@@ -48,27 +48,30 @@ class ilCodeQuestionESTIntegrationPageGUI
 		$this->estObj = new ilCodeQuestionESTIntegration($this->testObj, $this->plugin);
 	}
 
+	private function redirectToIndex(){
+		ilUtil::redirect('ilias.php?baseClass=iluipluginroutergui&cmdNode=we:xh&cmdClass=ilcodequestionestintegrationpagegui&cmd=showMainESTPage&ref_id='.$this->testObj->getRefId());
+	}
+
 	/**
 	* Handles all commands, default is "show"
 	*/
 	public function executeCommand()
 	{
+		
 		/** @var ilAccessHandler $ilAccess */
 		/** @var ilErrorHandling $ilErr */
 		global $ilAccess, $ilErr, $lng;
 
 		if (!$ilAccess->checkAccess('write','',$this->testObj->getRefId()))
 		{
-			echo "no permission";
-            ilUtil::sendFailure($lng->txt("permission_denied"), true);
-            ilUtil::redirect("goto.php?target=tst_".$this->testObj->getRefId());
+			ilUtil::sendFailure($lng->txt("permission_denied"), true);
+            $this->redirectToIndex();
 		}
-		
 		$cmd = $this->ctrl->getCmd('showTestOverview');
 		
 		switch ($cmd)
 		{
-			case 'uploadFiles':
+			case 'uploadFiles':			
 				$this->prepareOutput();
 				$this->tpl->setContent($this->uploadFiles());
 				$this->tpl->show();
@@ -83,7 +86,7 @@ class ilCodeQuestionESTIntegrationPageGUI
 			break;
 			default:
                 ilUtil::sendFailure($lng->txt("permission_denied"), true);
-                ilUtil::redirect("goto.php?target=tst_".$this->testObj->getRefId());
+                $this->redirectToIndex();
 				break;
 		}
 	}
@@ -130,7 +133,7 @@ class ilCodeQuestionESTIntegrationPageGUI
 		$form->setId("upload");
         $form->setMultipart(true);
 		$form->setHideLabels();
-		$form->setTarget("cld_blank_target");
+		//$form->setTarget("cld_blank_target");
 		$form->setFormAction($ilCtrl->getFormAction($this, "uploadFiles"));
 		$form->setTableWidth("100%");
 
@@ -214,13 +217,13 @@ class ilCodeQuestionESTIntegrationPageGUI
 
 		if ($file['error']!=0){
 			ilUtil::sendFailure($this->uploadCodeToMessage($file['error']), true);
-			ilUtil::redirect("goto.php?target=tst_".$this->testObj->getRefId());
+			$this->redirectToIndex();
 			return;
 		}
 
 		if (!file_exists($file['tmp_name'])){
 			ilUtil::sendFailure($lng->txt('file_not_found'), true);
-			ilUtil::redirect("goto.php?target=tst_".$this->testObj->getRefId());
+			$this->redirectToIndex();
 			return;
 		}
 		$results = $this->estObj->processZipFile($file['tmp_name']);
@@ -348,7 +351,7 @@ class ilCodeQuestionESTIntegrationPageGUI
 		if (!$ilAccess->checkAccess('write','',$this->testObj->getRefId()))
 		{
 			ilUtil::sendFailure($lng->txt("permission_denied"), true);
-            ilUtil::redirect("goto.php?target=tst_".$this->testObj->getRefId());
+            $this->redirectToIndex();
 		}
 
 		$zipFile  = tempnam(sys_get_temp_dir(), 'EST_');
@@ -357,7 +360,7 @@ class ilCodeQuestionESTIntegrationPageGUI
 		if (!is_null($err))
 		{
 			ilUtil::sendFailure($err, true);
-            ilUtil::redirect("goto.php?target=tst_".$this->testObj->getRefId());
+            $this->redirectToIndex();
 		}
 
 		$finfo = finfo_open(FILEINFO_MIME_TYPE);
@@ -384,7 +387,7 @@ class ilCodeQuestionESTIntegrationPageGUI
 			unlink($zipFile);
 		}
 		ilUtil::sendSuccess($this->plugin->txt("download_created"), true);		
-		$ilCtrl->redirect($this, "showMainESTPage");
+		$this->redirectToIndex();
 		//die;		
 	}
 }
