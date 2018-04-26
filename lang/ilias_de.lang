@@ -9,3 +9,7 @@ selected_files#:#Ausgewählte Dateien
 num_of_selected_files#:#%s Datei(en) ausgewählt
 logic_or#:#oder
 file_notice#:#Maximal erlaubte Upload-Größe:
+file_not_found#:#Die Datei wurde nicht gefunden.
+error_inconsistent_id#:#Fehlerhafte IDs
+error_incompatible_question#:#Nicht unterstützter Fragetyp
+archive_file#:#Archiv

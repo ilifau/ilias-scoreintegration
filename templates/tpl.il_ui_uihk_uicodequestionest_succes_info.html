@@ -1,0 +1,21 @@
+<h3>Stored Records ({NUMBER_STORED}):</h3>
+<table style="margin-left:10px;width:100%">
+    <tr style="font-weight: bold;border-bottom:1px solid rgba(0, 0, 0, .1);opacity:0.5">
+        <th>Login</th>
+        <th>Points</th>
+        <th>Comment</th>
+    </tr>
+    <!-- BEGIN success_line -->
+    <tr>
+        <td style="width:10%">
+            {LOGIN}
+        </td>
+        <td style="width:10%">
+            {POINTS}
+        </td>
+        <td>
+            <textarea readonly style="max-height:50px;overflow:scroll-y;width:100%;font-family: 'Courier New', Courier, monospace">{COMMENT}</textarea>
+        </td>
+    </tr>
+    <!-- END success_line -->
+</table>

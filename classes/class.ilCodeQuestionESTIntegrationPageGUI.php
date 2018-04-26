@@ -66,37 +66,13 @@ class ilCodeQuestionESTIntegrationPageGUI
 		
 		$cmd = $this->ctrl->getCmd('showTestOverview');
 		
-		if ($_POST['cmd'] && $_POST['cmd']['uploadFiles']){
-			/*$form = $this->getDragAndDropFileUploadForm();
-			
-			if ($form->checkInput())
-        	{
-				echo "IIIII";
-			}*/
-				
-			$file = $_FILES['upload_files'];
-
-			//foreach($files as $i=>$file)
-			{
-				
-				if ($file['error']!=0){
-					ilUtil::sendFailure($this->uploadCodeToMessage($file['error']), true);
-					ilUtil::redirect("goto.php?target=tst_".$this->testObj->getRefId());
-				}
-
-				if (!file_exists($file['tmp_name'])){
-					ilUtil::sendFailure($lng->txt('file_not_found'), true);
-					ilUtil::redirect("goto.php?target=tst_".$this->testObj->getRefId());
-				}
-				$result = $this->estObj->processZipFile($file['tmp_name']);
-				print_r($result);
-			}
-			print_r($_POST);
-			print_r($file);
-			die;
-		}
 		switch ($cmd)
 		{
+			case 'uploadFiles':
+				$this->prepareOutput();
+				$this->tpl->setContent($this->uploadFiles());
+				$this->tpl->show();
+				break;
 			case 'showMainESTPage':
 				$this->prepareOutput();
 				$this->tpl->setContent($this->overviewContent());
@@ -158,7 +134,7 @@ class ilCodeQuestionESTIntegrationPageGUI
 		$form->setFormAction($ilCtrl->getFormAction($this, "uploadFiles"));
 		$form->setTableWidth("100%");
 
-		$item = new ilCustomInputGUI($lng->txt('archive_file'));		
+		$item = new ilCustomInputGUI($this->plugin->txt('archive_file'));		
 		$item->setHTML('<input type="file" id="upload_files" name="upload_files">');
 		$form->addItem($item);	
 		$form->addCommandButton('uploadFiles', $lng->txt('submit'));
@@ -230,7 +206,97 @@ class ilCodeQuestionESTIntegrationPageGUI
 		return $form;
 	}
 
-	protected function overviewContent(){
+	protected function uploadFiles(){
+		/*$form = $this->getDragAndDropFileUploadForm();			
+		if ($form->checkInput()){}*/
+		$tpl = $this->overviewTemplate();
+		$file = $_FILES['upload_files'];
+
+		if ($file['error']!=0){
+			ilUtil::sendFailure($this->uploadCodeToMessage($file['error']), true);
+			ilUtil::redirect("goto.php?target=tst_".$this->testObj->getRefId());
+			return;
+		}
+
+		if (!file_exists($file['tmp_name'])){
+			ilUtil::sendFailure($lng->txt('file_not_found'), true);
+			ilUtil::redirect("goto.php?target=tst_".$this->testObj->getRefId());
+			return;
+		}
+		$results = $this->estObj->processZipFile($file['tmp_name']);
+
+		$info_tpl = $this->plugin->getTemplate('tpl.il_ui_uihk_uicodequestionest_succes_info.html');
+		$err_tpl = $this->plugin->getTemplate('tpl.il_ui_uihk_uicodequestionest_fail_info.html');
+
+		//SUCCESS		
+		$info_tpl->setCurrentBlock("success_line");
+		$count = 0;
+		$countu = 0;
+		foreach($results["files"] as $file){
+			if ($file['stored']){
+				$count++;
+				
+				$info_tpl->setVariable("LOGIN", $file['login']);
+				$info_tpl->setVariable("POINTS", $file['points']);
+				$info_tpl->setVariable("COMMENT", $file['comment']);
+				$info_tpl->parseCurrentBlock();
+			} else {
+				$countu++;
+			}
+		}
+		$info_tpl->setVariable("NUMBER_STORED", $count);
+
+		//ERROR
+		if ($countu>0){
+			$err_tpl->setCurrentBlock("unprocessed_line");
+			foreach($results["files"] as $file){
+				if (!$file['stored']){
+					$err_tpl->setVariable("LOGIN", $file['login']);
+					$err_tpl->setVariable("POINTS", $file['points']);
+					$err_tpl->setVariable("COMMENT", $file['comment']);
+					$err_tpl->setVariable("ERROR", $file['error']);
+					$err_tpl->parseCurrentBlock();
+				}
+			}
+			$err_tpl->setVariable("NUMBER_UNPROCESSED", $countu);
+
+			$err_tpl->setCurrentBlock("unprocessed");
+			$err_tpl->parseCurrentBlock();
+		}
+				
+		
+		if (count($results['wrongTest'])>0){
+			$err_tpl->setCurrentBlock("wrongtest_line");
+			foreach($results["wrongTest"] as $file){
+				$err_tpl->setVariable("LOGIN", $file['login']);
+				$err_tpl->setVariable("TEST_ID", $file['testID']);
+				$err_tpl->parseCurrentBlock();				
+			}
+			$err_tpl->setVariable("NUMBER_WRONG", count($results['wrongTest']));
+
+			$err_tpl->setCurrentBlock("wrongtest");
+			$err_tpl->parseCurrentBlock();
+		}
+
+		if (count($results['invalidComment'])>0){
+			$err_tpl->setCurrentBlock("invalid_line");
+			foreach($results["invalidComment"] as $file){
+				$err_tpl->setVariable("LOGIN", $file['login']);
+				$err_tpl->setVariable("CONTENT", $file['rawContent']);
+				$err_tpl->parseCurrentBlock();				
+			}
+			$err_tpl->setVariable("NUMBER_INVALID", count($results['invalidComment']));
+
+			$err_tpl->setCurrentBlock("invalid");
+			$err_tpl->parseCurrentBlock();
+		}
+		
+		ilUtil::sendSuccess($info_tpl->get(), true);
+		ilUtil::sendFailure($err_tpl->get(), true);
+		return $tpl->get();
+	}
+
+	protected function overviewTemplate(){
 		global $ilCtrl, $ilDB;
 
 		$data      = $this->testObj->getCompleteEvaluationData(TRUE);
@@ -243,8 +309,12 @@ class ilCodeQuestionESTIntegrationPageGUI
 		//echo $this->getFileUploadFormHTML()."<hr>";die;
 		//$upload = $this->getFileUploadForm();
 		$tpl->setVariable("FILE_UPLOAD", $this->getFileUploadForm()->getHTML());
+		return $tpl;
+	}
+
+	protected function overviewContent(){		
 		
-		return $tpl->get();					
+		return $this->overviewTemplate()->get();					
 	}
 
 	/**
@@ -313,7 +383,7 @@ class ilCodeQuestionESTIntegrationPageGUI
 		if (file_exists($zipFile)){
 			unlink($zipFile);
 		}
-		ilUtil::sendSuccess($this->lng->txt("download_created"), true);		
+		ilUtil::sendSuccess($this->plugin->txt("download_created"), true);		
 		$ilCtrl->redirect($this, "showMainESTPage");
 		//die;		
 	}

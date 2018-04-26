@@ -9,3 +9,7 @@ selected_files#:#Selected files
 num_of_selected_files#:#%s file(s) selected
 logic_or#:#or
 file_notice#:#Maximum upload size:
+file_not_found#:#Unable to locate the file.
+error_inconsistent_id#:#Inconsistent IDs
+error_incompatible_question#:#Incompatible Question Type
+archive_file#:#Archive

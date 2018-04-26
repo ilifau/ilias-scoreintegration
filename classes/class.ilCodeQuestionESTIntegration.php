@@ -28,6 +28,8 @@ class ilCodeQuestionESTIntegration
 	 */
 	public function __construct($a_test_obj, $a_plugin)
 	{
+		global $lng;
+		$lng->loadLanguageModule('assessment');
 		$this->testObj = $a_test_obj;
 		$this->plugin = $a_plugin;
 	}
@@ -109,7 +111,8 @@ class ilCodeQuestionESTIntegration
 			"metaFiles" => array(),
 			"unparsableEntries" => array(),
 			"ignoredFiles" => array(),
-			"invalidComment" => array()
+			"invalidComment" => array(),
+			"wrongTest" => array()
 		);
 		
 		for ($i=0; $i<$zip->numFiles;$i++) {
@@ -126,12 +129,12 @@ class ilCodeQuestionESTIntegration
 			}
 
 			$matches = array();
-			preg_match_all(':test-([0-9]+)/question-([0-9]+)/solution-([0-9]+)-([0-9]+)-([0-9]+)-(.*)/(.*):', $filePath, $matches);
-			if (count($matches)!=8 || trim($matches[7][0])=='') {
+			preg_match_all(':test-([0-9]+)/question-([0-9]+)/solution-([0-9]+)-([0-9]+)-([0-9]+)-([0-9]+)-(.*)/(.*):', $filePath, $matches);
+			if (count($matches)!=9 || trim($matches[8][0])=='' || count($matches[0])==0) {
 				$result['unparsableEntries'][] = $item['name'];
 				continue;
 			}			
-			$fileName = trim($matches[7][0]);
+			$fileName = trim($matches[8][0]);
 
 			$obj = array(
 				"path" => $filePath,
@@ -140,27 +143,57 @@ class ilCodeQuestionESTIntegration
 				"questionID" => (int)$matches[2][0],
 				"solutionID" => (int)$matches[3][0],
 				"activeID" => (int)$matches[4][0],
-				"userID" => (int)$matches[5][0],
-				"login" => trim($matches[6][0])
+				"pass" => (int)$matches[5][0],
+				"userID" => (int)$matches[6][0],
+				"login" => trim($matches[7][0])
 			);
 			if (strtolower($obj["file"]) == 'comment'){		
 				$obj['rawContent'] = $zip->getFromIndex($i);
 				preg_match_all('/.*\:\s*(-?[0-9]+(\.[0-9]+)?)\s*\n([\s\S]*)/', $obj['rawContent'], $matches);
 				//print_r($matches);
-				if (count($matches)!=4){
+				if (count($matches)!=4 || count($matches[0])==0){
 					$result['invalidComment'][] = $obj;					
+				} else if ($this->testObj->getID() != $obj['testID']){
+					$result['wrongTest'][] = $obj;
 				} else {
 					$obj['points'] = (float)$matches[1][0];
-					$obj['comment'] = $matches[3][0];
+					$obj['comment'] = trim($matches[3][0]);
+					$obj['stored'] = false;
 					$result['files'][] = $obj;			
 				}
 			} else {
 				$result['ignoredFiles'][] = $obj;			
 			}
 		}
-		echo "numFile:" . $zip->numFiles . "\n";
+		$this->storeInfo($result);
 
 		return $result;
+	}
+
+	private function storeInfo(&$zipResults){
+		global $lng;
+
+		foreach($zipResults['files'] as &$obj){
+			$objQuestion = $questions[$obj["questionID"]];
+			if (!$objQuestion){
+				$objQuestion = $this->testObj->_instanciateQuestion($obj["questionID"]);
+				$questions[$obj["questionID"]] = $objQuestion;
+			}
+			if (method_exists($objQuestion, 'getExportSolution') ){
+				$solution = $objQuestion->getExportSolution($obj["activeID"], $obj["pass"]);
+				if ($solution['solution_id'] == $obj["solutionID"] && 
+					$solution['active_fi'] == $obj["activeID"] &&
+					$solution['question_fi'] == $obj["questionID"] &&
+					$solution['pass'] == $obj["pass"] ){
+						$this->updatePoints($obj["activeID"], $obj["questionID"], $obj["pass"], $obj["points"], $objQuestion->getPoints(), $obj["comment"]);
+						$obj['stored'] = true;
+				} else {
+					$obj['error'] = $this->plugin->txt('error_inconsistent_id');
+				}
+			}  else {
+				$obj['error'] = $this->plugin->txt('error_incompatible_question');
+			}
+		}
 	}
 	
 	function buildZIP($zipFile){
@@ -192,7 +225,7 @@ class ilCodeQuestionESTIntegration
 						$solution = $objQuestion->getExportSolution($active_id, $pass);
 						$code = $objQuestion->getCompleteSource($solution);
 
-						$subFolder = sprintf("solution-%06d-%06d-%06d-%s", $solution['solution_id'], $solution['active_fi'], $userdata->user_id, $userdata->login);
+						$subFolder = sprintf("solution-%06d-%06d-%06d-%06d-%s", $solution['solution_id'], $solution['active_fi'], $solution['pass'], $userdata->user_id, $userdata->login);
 						$subFolder = $questionBase.'/'.preg_replace('/[^A-Za-z0-9_\-]/', '', $subFolder);
 						$zip->addFromString($subFolder.'/'.$filename, $code);
 
