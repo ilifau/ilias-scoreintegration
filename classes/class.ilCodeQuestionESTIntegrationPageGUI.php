@@ -84,6 +84,9 @@ class ilCodeQuestionESTIntegrationPageGUI
 			case 'zip':
 				$this->sendZIP();
 			break;
+			case 'latexZip':
+				$this->sendLatexZIP();
+			break;
 			default:
                 ilUtil::sendFailure($lng->txt("permission_denied"), true);
                 $this->redirectToIndex();
@@ -308,7 +311,7 @@ class ilCodeQuestionESTIntegrationPageGUI
 		$tpl = $this->plugin->getTemplate('tpl.il_ui_uihk_uicodequestionest_main_page.html');
 		$tpl->setVariable("PARTICIPANT_COUNT", count($data->getParticipants()));
 		$tpl->setVariable("LINK_ZIP", $ilCtrl->getLinkTargetByClass(array('ilUIPluginRouterGUI','ilCodeQuestionESTIntegrationPageGUI')).'&cmd=zip');
-
+		$tpl->setVariable("LINK_LATEXZIP", $ilCtrl->getLinkTargetByClass(array('ilUIPluginRouterGUI','ilCodeQuestionESTIntegrationPageGUI')).'&cmd=latexZip');
 		//echo $this->getFileUploadFormHTML()."<hr>";die;
 		//$upload = $this->getFileUploadForm();
 		$tpl->setVariable("FILE_UPLOAD", $this->getFileUploadForm()->getHTML());
@@ -356,6 +359,54 @@ class ilCodeQuestionESTIntegrationPageGUI
 
 		$zipFile  = tempnam(sys_get_temp_dir(), 'EST_');
 		$err = $this->estObj->buildZIP($zipFile);
+
+		if (!is_null($err))
+		{
+			ilUtil::sendFailure($err, true);
+            $this->redirectToIndex();
+		}
+
+		$finfo = finfo_open(FILEINFO_MIME_TYPE);
+		header('Content-Type: ' . finfo_file($finfo, $zipFile));
+		finfo_close($finfo);
+
+		//Use Content-Disposition: attachment to specify the filename
+		header('Content-Disposition: attachment; filename='.basename($zipFile));
+
+		//No cache
+		header('Expires: 0');
+		header('Cache-Control: must-revalidate');
+		header('Pragma: public');
+
+		//Define file size
+		header('Content-Length: ' . filesize($zipFile));
+
+		ob_clean();
+		flush();
+		readfile($zipFile);
+
+		//cleanup
+		if (file_exists($zipFile)){
+			unlink($zipFile);
+		}
+		ilUtil::sendSuccess($this->plugin->txt("download_created"), true);		
+		$this->redirectToIndex();
+		//die;		
+	}
+	
+	function sendLatexZIP(){
+		/** @var ilAccessHandler $ilAccess */
+		/** @var ilErrorHandling $ilErr */
+		global $ilAccess, $ilErr, $lng;
+
+		if (!$ilAccess->checkAccess('write','',$this->testObj->getRefId()))
+		{
+			ilUtil::sendFailure($lng->txt("permission_denied"), true);
+            $this->redirectToIndex();
+		}
+
+		$zipFile  = tempnam(sys_get_temp_dir(), 'Latex_');
+		$err = $this->estObj->buildLatexZIP($zipFile);
 
 		if (!is_null($err))
 		{
