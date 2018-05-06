@@ -277,7 +277,7 @@ class ilCodeQuestionESTIntegration
 
 	function buildLatexZIP($zipFile) {
 		$data      = $this->testObj->getCompleteEvaluationData(TRUE);
-		$testString = "1213";//sprintf("test-%06d", $this->$testObj->getId());
+		$testString = sprintf("test-%06d", $this->testObj->getId());
 		$tempBase = sprintf('./Latex-Export/%s', $testString);
 		
 		$zip = new ZipArchive();
@@ -298,7 +298,6 @@ class ilCodeQuestionESTIntegration
 					$questions[$question["id"]] = $objQuestion;
 				}
 				if (method_exists($objQuestion, 'getCompleteSource') && 
-					method_exists($objQuestion, 'getExportFilename') &&
 					method_exists($objQuestion, 'getExportSolution')) {
 						
 					$solution = $objQuestion->getExportSolution($active_id, $pass);
