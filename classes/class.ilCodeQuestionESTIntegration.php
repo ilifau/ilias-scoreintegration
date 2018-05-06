@@ -304,7 +304,7 @@ class ilCodeQuestionESTIntegration
 					$solution = $objQuestion->getExportSolution($active_id, $pass);
 					$code = $objQuestion->getCompleteSource($solution);
 					$questionString = sprintf("question-%06d", $question["id"]);
-					$stringP = $this->addQuestion($stringP, $questionString, $code);
+					$stringP = $this->addQuestionToString($stringP, $questionString, $code);
 				}
 			}
 			$stringP = $this->finishParticipantString($stringP);
@@ -341,6 +341,7 @@ class ilCodeQuestionESTIntegration
 					"\\lhead{%s}\n" .
 					"\\lfoot{Klausur Grundlagen der Informatik (%s)}\n" .
 					"\\rfoot{(Seite \\thepage /\\pageref{LastPage})}\n" .
+					"\\cfoot{}" . 
 					"\\renewcommand{\\headrulewidth}{0.4pt}\n" .
 					"\\renewcommand{\\footrulewidth}{0.4pt}\n\n" .
 					"\\begin{document}\n", $participant, $test);
