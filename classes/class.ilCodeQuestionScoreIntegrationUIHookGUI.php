@@ -1,6 +1,7 @@
 <?php
 
 include_once("./Services/UIComponent/classes/class.ilUIHookPluginGUI.php");
+require_once ('Modules/Test/classes/class.ilObjTest.php');
 
 /**
  * User interface hook class
@@ -13,9 +14,14 @@ class ilCodeQuestionScoreIntegrationUIHookGUI extends ilUIHookPluginGUI
 {
 
 	/**
-	 * @var assCodeQuestion	The question object
+	 * @var bool true if the test includes source code questions
 	 */
-	var $object = null;
+	var $hasCodeQuestions = false;
+	
+
+	public function __construct(){
+		
+	}
 
 	/**
 	 * Modify HTML output of GUI elements. Modifications modes are:
@@ -45,12 +51,29 @@ class ilCodeQuestionScoreIntegrationUIHookGUI extends ilUIHookPluginGUI
 	function modifyGUI($a_comp, $a_part, $a_par = array())
 	{
 		global $ilCtrl, $ilTabs;
-
+		
 		switch ($a_part)
 		{
 			// case 'tabs':
 			case 'sub_tabs':
 			if (in_array($ilCtrl->getCmdClass(), array('iltestscoringbyquestionsgui', 'iltestscoringgui')) ) {
+				if (!$this->hasCodeQuestions) {
+					$test = new ilObjTest($_GET['ref_id']);
+
+					//see if we have source Code questions available
+					$questions = $test->getQuestions();
+					foreach ($questions as $q) {
+						$question =& ilObjTest::_instanciateQuestion($q);
+						if (method_exists($question, 'getCompleteSource') && 
+							method_exists($question, 'getExportFilename') &&
+							method_exists($question, 'getExportSolution')){
+								$this->hasCodeQuestions = true;
+								break;
+							}
+					}
+				}
+				if (!$this->hasCodeQuestions) return;
+				
 				$ilCtrl->saveParameterByClass('ilCodeQuestionScoreIntegrationPageGUI','ref_id');
 				
 				$ilTabs->addSubTab("scrintegration",
