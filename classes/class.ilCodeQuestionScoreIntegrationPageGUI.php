@@ -9,9 +9,9 @@ require_once 'Services/Form/classes/class.ilPropertyFormGUI.php';
  * @author Frank Bauer <frank.bauer@fau.de>
  * @version $Id$
  *
- * @ilCtrl_IsCalledBy ilCodeQuestionESTIntegrationPageGUI: ilUIPluginRouterGUI
+ * @ilCtrl_IsCalledBy ilCodeQuestionScoreIntegrationPageGUI: ilUIPluginRouterGUI
  */
-class ilCodeQuestionESTIntegrationPageGUI
+class ilCodeQuestionScoreIntegrationPageGUI
 {
     /** @var ilCtrl $ctrl */
 	protected $ctrl;
@@ -19,17 +19,17 @@ class ilCodeQuestionESTIntegrationPageGUI
 	/** @var ilTemplate $tpl */
 	protected $tpl;
 
-	/** @var ilCodeQuestionESTIntegrationPlugin $plugin */
+	/** @var ilCodeQuestionScoreIntegrationPlugin $plugin */
 	protected $plugin;
 
 	/** @var ilObjTest $testObj */
 	protected $testObj;
 
-	/** @var ilCodeQuestionESTIntegration $estObj */
+	/** @var ilCodeQuestionScoreIntegration $estObj */
 	protected $estObj;
 
 	/**
-	 * ilCodeQuestionESTIntegrationPageGUI constructor.
+	 * ilCodeQuestionScoreIntegrationPageGUI constructor.
 	 */
 	public function __construct()
 	{
@@ -40,16 +40,16 @@ class ilCodeQuestionESTIntegrationPageGUI
 
 		$lng->loadLanguageModule('assessment');
 
-		$this->plugin = ilPlugin::getPluginObject(IL_COMP_SERVICE, 'UIComponent', 'uihk', 'CodeQuestionESTIntegration');
-		$this->plugin->includeClass('class.ilCodeQuestionESTIntegration.php');
+		$this->plugin = ilPlugin::getPluginObject(IL_COMP_SERVICE, 'UIComponent', 'uihk', 'CodeQuestionScoreIntegration');
+		$this->plugin->includeClass('class.ilCodeQuestionScoreIntegration.php');
 		$this->plugin->loadLanguageModule();
 
 		$this->testObj = new ilObjTest($_GET['ref_id']);
-		$this->estObj = new ilCodeQuestionESTIntegration($this->testObj, $this->plugin);
+		$this->estObj = new ilCodeQuestionScoreIntegration($this->testObj, $this->plugin);
 	}
 
 	private function redirectToIndex(){
-		ilUtil::redirect('ilias.php?baseClass=iluipluginroutergui&cmdNode=we:xh&cmdClass=ilcodequestionestintegrationpagegui&cmd=showMainESTPage&ref_id='.$this->testObj->getRefId());
+		ilUtil::redirect('ilias.php?baseClass=iluipluginroutergui&cmdNode=we:xh&cmdClass=ilCodeQuestionScoreintegrationpagegui&cmd=showMainAutoScorePage&ref_id='.$this->testObj->getRefId());
 	}
 
 	/**
@@ -67,7 +67,7 @@ class ilCodeQuestionESTIntegrationPageGUI
 			ilUtil::sendFailure($lng->txt("permission_denied"), true);
             $this->redirectToIndex();
 		}
-		$cmd = $this->ctrl->getCmd('showTestOverview');
+		$cmd = $this->ctrl->getCmd('showMainAutoScorePage');
 		
 		switch ($cmd)
 		{
@@ -76,13 +76,16 @@ class ilCodeQuestionESTIntegrationPageGUI
 				$this->tpl->setContent($this->uploadFiles());
 				$this->tpl->show();
 				break;
-			case 'showMainESTPage':
+			case 'showMainAutoScorePage':
 				$this->prepareOutput();
 				$this->tpl->setContent($this->overviewContent());
 				$this->tpl->show();
 			break;
 			case 'zip':
-				$this->sendZIP();
+				$this->sendZIP(FALSE);
+			break;
+			case 'latexZip':
+				$this->sendZIP(TRUE);
 			break;
 			default:
                 ilUtil::sendFailure($lng->txt("permission_denied"), true);
@@ -228,8 +231,8 @@ class ilCodeQuestionESTIntegrationPageGUI
 		}
 		$results = $this->estObj->processZipFile($file['tmp_name']);
 
-		$info_tpl = $this->plugin->getTemplate('tpl.il_ui_uihk_uicodequestionest_succes_info.html');
-		$err_tpl = $this->plugin->getTemplate('tpl.il_ui_uihk_uicodequestionest_fail_info.html');
+		$info_tpl = $this->plugin->getTemplate('tpl.il_ui_uihk_uicodequestionscore_succes_info.html');
+		$err_tpl = $this->plugin->getTemplate('tpl.il_ui_uihk_uicodequestionscore_fail_info.html');
 
 		//SUCCESS		
 		$info_tpl->setCurrentBlock("success_line");
@@ -303,12 +306,12 @@ class ilCodeQuestionESTIntegrationPageGUI
 		global $ilCtrl, $ilDB;
 
 		$data      = $this->testObj->getCompleteEvaluationData(TRUE);
-		$ilCtrl->saveParameterByClass('ilCodeQuestionESTIntegrationPageGUI','ref_id');
+		$ilCtrl->saveParameterByClass('ilCodeQuestionScoreIntegrationPageGUI','ref_id');
 
-		$tpl = $this->plugin->getTemplate('tpl.il_ui_uihk_uicodequestionest_main_page.html');
+		$tpl = $this->plugin->getTemplate('tpl.il_ui_uihk_uicodequestionscore_main_page.html');
 		$tpl->setVariable("PARTICIPANT_COUNT", count($data->getParticipants()));
-		$tpl->setVariable("LINK_ZIP", $ilCtrl->getLinkTargetByClass(array('ilUIPluginRouterGUI','ilCodeQuestionESTIntegrationPageGUI')).'&cmd=zip');
-
+		$tpl->setVariable("LINK_ZIP", $ilCtrl->getLinkTargetByClass(array('ilUIPluginRouterGUI','ilCodeQuestionScoreIntegrationPageGUI')).'&cmd=zip');
+		$tpl->setVariable("LINK_LATEXZIP", $ilCtrl->getLinkTargetByClass(array('ilUIPluginRouterGUI','ilCodeQuestionScoreIntegrationPageGUI')).'&cmd=latexZip');
 		//echo $this->getFileUploadFormHTML()."<hr>";die;
 		//$upload = $this->getFileUploadForm();
 		$tpl->setVariable("FILE_UPLOAD", $this->getFileUploadForm()->getHTML());
@@ -338,12 +341,12 @@ class ilCodeQuestionESTIntegrationPageGUI
 		$this->tpl->setTitle($this->testObj->getPresentationTitle());
 		$this->tpl->setDescription($this->testObj->getLongDescription());
 		$this->tpl->setTitleIcon(ilObject::_getIcon('', 'big', 'tst'), $lng->txt('obj_tst'));
-		$this->tpl->addCss($this->plugin->getStyleSheetLocation('uicodequestionest.css'));		
+		$this->tpl->addCss($this->plugin->getStyleSheetLocation('uicodequestionscore.css'));		
 
 		return true;
 	}
 
-	function sendZIP(){
+	function sendZIP($latex){
 		/** @var ilAccessHandler $ilAccess */
 		/** @var ilErrorHandling $ilErr */
 		global $ilAccess, $ilErr, $lng;
@@ -354,8 +357,13 @@ class ilCodeQuestionESTIntegrationPageGUI
             $this->redirectToIndex();
 		}
 
-		$zipFile  = tempnam(sys_get_temp_dir(), 'EST_');
-		$err = $this->estObj->buildZIP($zipFile);
+		if ($latex) {
+			$zipFile  = tempnam(sys_get_temp_dir(), 'Latex_');
+			$err = $this->estObj->buildLatexZIP($zipFile);
+		} else {
+			$zipFile  = tempnam(sys_get_temp_dir(), 'EST_');
+			$err = $this->estObj->buildZIP($zipFile);
+		}
 
 		if (!is_null($err))
 		{

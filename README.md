@@ -1,4 +1,4 @@
-# ILIAS EST Integration Plugin
+# ILIAS Quode Question Score Integration Plugin
 
 **Author**:   Frank Bauer <frank.bauer@fau.de>
 
@@ -29,14 +29,14 @@ THE SOFTWARE.
 
 ## Installation
 1. Copy the `
-CodeQuestionESTIntegration` directory to your ILIAS installation at the following path 
+CodeQuestionScoreIntegration` directory to your ILIAS installation at the following path 
 (create subdirectories, if neccessary):
-`Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/CodeQuestionESTIntegration`
+`Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/CodeQuestionScoreIntegration`
 
 2. Go to Administration > Plugins
 
-3. Choose **Update** for the `CodeQuestionESTIntegration` plugin
-4. Choose **Activate** for the `CodeQuestionESTIntegration` plugin
-5. Choose **Refresh** for the `CodeQuestionESTIntegration` plugin languages
+3. Choose **Update** for the `CodeQuestionScoreIntegration` plugin
+4. Choose **Activate** for the `CodeQuestionScoreIntegration` plugin
+5. Choose **Refresh** for the `CodeQuestionScoreIntegration` plugin languages
 
 There is nothing to configure for this plugin.

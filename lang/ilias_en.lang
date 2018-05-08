@@ -1,6 +1,6 @@
-// English Language File for CodeQuestionESTIntegration Plugin
+// English Language File for CodeQuestionScoreIntegration Plugin
 <!-- language file start -->
-est_integration#:#EST Integration
+score_integration#:#Auto Score
 hide_all_details#:#Hide all details
 show_all_details#:#Show all details
 select_files_from_computer#:#Select the files from your computer

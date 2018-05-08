@@ -12,19 +12,19 @@ require_once './Modules/TestQuestionPool/interfaces/interface.ilObjFileHandlingQ
  * @version $Id$
  *
  */
-class ilCodeQuestionESTIntegration
+class ilCodeQuestionScoreIntegration
 {
 	/** @var ilObjTest $testObj */
 	protected $testObj;
 
-	/** @var ilCodeQuestionESTIntegrationPlugin $plugin */
+	/** @var ilCodeQuestionScoreIntegrationPlugin $plugin */
 	protected $plugin;
 
 	/**
-	 * ilCodeQuestionESTIntegration constructor.
+	 * ilCodeQuestionScoreIntegration constructor.
 	 *
 	 * @param ilObjTest $a_test_obj
-	 * @param ilCodeQuestionESTIntegration $a_plugin
+	 * @param ilCodeQuestionScoreIntegration $a_plugin
 	 */
 	public function __construct($a_test_obj, $a_plugin)
 	{
@@ -270,6 +270,113 @@ class ilCodeQuestionESTIntegration
 		while ($row = $ilDB->fetchAssoc($result))
 		{
 			return $row['points'];
+		}
+
+		return 0;
+	}
+
+	function buildLatexZIP($zipFile) {
+		$data      = $this->testObj->getCompleteEvaluationData(TRUE);
+		$testString = sprintf("test-%06d", $this->testObj->getId());
+		$tempBase = sprintf('./Latex-Export/%s', $testString);
+		
+		$zip = new ZipArchive();
+		if ($zip->open($zipFile, ZipArchive::CREATE)!==TRUE) {			
+			return "cannot open <$tempBase>\n";            
+		}
+
+		foreach($data->getParticipants() as $active_id => $userdata) {			
+				// Do something with the participants				
+			$pass = $userdata->getScoredPass();
+			$usrInfo = $this->getParticipantInfo($active_id);
+			$stringP = $this->initParticipantString($usrInfo, $testString);
+
+			foreach($userdata->getQuestions($pass) as $question) {
+				$objQuestion = $questions[$question["id"]];
+				if (!$objQuestion){
+					$objQuestion = $this->testObj->_instanciateQuestion($question["id"]);
+					$questions[$question["id"]] = $objQuestion;
+				}
+				if (method_exists($objQuestion, 'getCompleteSource') && 
+					method_exists($objQuestion, 'getExportSolution')) {
+						
+					$solution = $objQuestion->getExportSolution($active_id, $pass);
+					$code = $objQuestion->getCompleteSource($solution);
+					$questionString = sprintf("question-%06d", $question["id"]);
+					$stringP = $this->addQuestionToString($stringP, $questionString, $code);
+				}
+			}
+			$stringP = $this->finishParticipantString($stringP);
+			$file = sprintf($tempBase . "/%s.tex", $usrInfo);
+			$zip->addFromString($file, $stringP);
+		}
+		$zip->close();
+
+		return NULL;
+	}
+
+	protected function initParticipantString($participant, $test) {
+		$string = sprintf("\\documentclass[landscape]{article}\n\n" .
+					"\\usepackage[margin=2cm,right=3cm]{geometry}\n" .
+					"\\usepackage[ngerman]{babel}\n" .
+					"\\usepackage[doublespacing]{setspace}\n" .
+					"\usepackage{lastpage}" .
+					"\\usepackage{listings}\n" .
+					"\\usepackage{color}\n\n" .
+					"\\lstset{ \n" .
+						"\t language=Java,\n" .
+						"\t breakatwhitespace=false,\n" . 
+						"\t breaklines=true,\n" . 
+						"\t captionpos=b,\n" . 
+						"\t keepspaces=true,\n" . 
+						"\t numbers=left, \n" . 
+						"\t showspaces=false,\n" .
+						"\t showstringspaces=false,\n" .
+						"\t showtabs=false,\n" .
+						"\t tabsize=2\n" .
+					"}\n\n" .
+					"\\usepackage{fancyhdr}\n" .
+					"\\pagestyle{fancy}\n" .
+					"\\lhead{%s}\n" .
+					"\\lfoot{Klausur Grundlagen der Informatik (%s)}\n" .
+					"\\rfoot{(Seite \\thepage /\\pageref{LastPage})}\n" .
+					"\\cfoot{}" . 
+					"\\renewcommand{\\headrulewidth}{0.4pt}\n" .
+					"\\renewcommand{\\footrulewidth}{0.4pt}\n\n" .
+					"\\begin{document}\n", $participant, $test);
+		return $string;
+	}
+
+	protected function addQuestionToString($string, $question, $code) {
+		$string = sprintf($string . 
+					"\\rhead{%s}\n" .
+					"\\begin{lstlisting}\n" .
+					"%s \n".
+					"\\end{lstlisting}\n\n" .
+					"\\newpage \n\n" ,
+					$question, $code);
+		return $string;
+	}
+
+	protected function finishParticipantString($string) {
+		$string = sprintf($string . 
+					"\\end{document}"
+				);
+		return $string;
+	}
+
+	protected function getParticipantInfo($active_fi) {
+		global $ilDB;
+
+		$query = "SELECT lastname, firstname, login, matriculation " .
+				 "FROM tst_active, usr_data " .
+				 "WHERE user_fi = usr_id " . 
+				 "AND active_id = " . $ilDB->quote($active_fi, 'integer');
+		
+		$result = $ilDB->query($query);
+
+		while($row = $ilDB->fetchAssoc($result)) {
+			return $row['lastname'] . ',' .$row['firstname'] . '(' . $row['login'] . ',' . $row['matriculation'] . ')';
 		}
 
 		return 0;

@@ -1,7 +1,7 @@
 <?php
 
 // alphanumerical ID of the plugin; never change this
-$id = "uicodequestionest";
+$id = "uicodequestionscore";
 
 // code version; must be changed for all code changes
 $version = "1.0.1";

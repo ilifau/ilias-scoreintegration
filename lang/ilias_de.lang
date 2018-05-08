@@ -1,6 +1,6 @@
-// German Language File for CodeQuestionESTIntegration Plugin
+// German Language File for CodeQuestionScoreIntegration Plugin
 <!-- language file start -->
-est_integration#:#EST Anbindung
+score_integration#:#Auto Score
 hide_all_details#:#Alle Details ausblenden
 show_all_details#:#Alle Details anzeigen
 select_files_from_computer#:#Wählen Sie die Dateien von Ihrem Computer aus
