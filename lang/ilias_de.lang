@@ -1,6 +1,6 @@
 // German Language File for CodeQuestionScoreIntegration Plugin
 <!-- language file start -->
-score_integration#:#Auto Score
+score_integration#:#Code Bewertung
 hide_all_details#:#Alle Details ausblenden
 show_all_details#:#Alle Details anzeigen
 select_files_from_computer#:#Wählen Sie die Dateien von Ihrem Computer aus

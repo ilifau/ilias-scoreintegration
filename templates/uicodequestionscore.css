@@ -1,4 +1,4 @@
-div#exporting, div#importing{
+div#exporting, div#importing, div#exportingTex{
     border:1px solid silver;
     background-color:white;
     padding:4px;
