@@ -3,9 +3,9 @@
 include_once("./Services/Component/classes/class.ilPluginConfigGUI.php");
  
 /**
- * Example configuration user interface class
+ * Configuration user interface class
  *
- * @author Alex Killing <alex.killing@gmx.de>
+ * @author Frank Bauer <frank.bauer@fau.de>
  * @version $Id$
  *
  */

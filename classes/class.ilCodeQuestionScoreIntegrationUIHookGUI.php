@@ -1,13 +1,11 @@
 <?php
 
-/* Copyright (c) 1998-2010 ILIAS open source, Extended GPL, see docs/LICENSE */
-
 include_once("./Services/UIComponent/classes/class.ilUIHookPluginGUI.php");
 
 /**
  * User interface hook class
  *
- * @author Alex Killing <alex.killing@gmx.de>
+ * @author Frank Bauer <frank.bauer@fau.de>
  * @version $Id$
  * @ingroup ServicesUIComponent
  */
