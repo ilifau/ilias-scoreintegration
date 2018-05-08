@@ -52,18 +52,33 @@ class ilCodeQuestionScoreIntegrationUIHookGUI extends ilUIHookPluginGUI
 			case 'sub_tabs':
 			if (in_array($ilCtrl->getCmdClass(), array('iltestscoringbyquestionsgui', 'iltestscoringgui')) ) {
 				$ilCtrl->saveParameterByClass('ilCodeQuestionScoreIntegrationPageGUI','ref_id');
-				$a_par["tabs"]->addTab("score_integration", $this->plugin_object->txt("score_integration"), $ilCtrl->getLinkTargetByClass(array('ilUIPluginRouterGUI','ilCodeQuestionScoreIntegrationPageGUI'), 'showMainAutoScorePage'));
+				
+				$ilTabs->addSubTab("scrintegration",
+					$this->plugin_object->txt("score_integration"),
+					$ilCtrl->getLinkTargetByClass(array('ilUIPluginRouterGUI','ilCodeQuestionScoreIntegrationPageGUI')));				
 
-				$ilTabs->addSubTabTarget(
-					$this->plugin_object->txt('score_integration'), // text is also the aubtab id
-					$ilCtrl->getLinkTargetByClass(array('ilUIPluginRouterGUI','ilCodeQuestionScoreIntegrationPageGUI'), 'showMainAutoScorePage'),
-					array('showMainAutoScorePage'), // commands to be recognized for activation
-					'ilCodeQuestionScoreIntegrationPageGUI', 	// cmdClass to be recognized activation
-					'', 								// frame
-					false, 								// manual activation
-					true								// text is direct, not a language var
-				);
+				// save the tabs for reuse on the plugin pages
+				// (these do not have the test gui as parent)
+				// not nice, but effective
+				$_SESSION['CodeQuestionScoreIntegration']['TabTarget'] = $ilTabs->target;
+				$_SESSION['CodeQuestionScoreIntegration']['TabSubTarget'] = $ilTabs->sub_target;				
 			}
+
+			if ($ilCtrl->getCmdClass()  == 'ilcodequestionscoreintegrationpagegui')
+				{
+					// reuse the tabs that were saved from the test gui
+					if (isset($_SESSION['CodeQuestionScoreIntegration']['TabTarget']))
+					{ 
+						$ilTabs->target = $_SESSION['CodeQuestionScoreIntegration']['TabTarget'];
+					}
+					if (isset($_SESSION['CodeQuestionScoreIntegration']['TabSubTarget']))
+					{						
+						$ilTabs->sub_target = $_SESSION['CodeQuestionScoreIntegration']['TabSubTarget'];
+					}
+
+					// this works because the tabs are rendered after the sub tabs
+					$ilTabs->activateTab('manscoring');																
+				}
 				
 			break;
 

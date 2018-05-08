@@ -67,7 +67,7 @@ class ilCodeQuestionScoreIntegrationPageGUI
 			ilUtil::sendFailure($lng->txt("permission_denied"), true);
             $this->redirectToIndex();
 		}
-		$cmd = $this->ctrl->getCmd('showTestOverview');
+		$cmd = $this->ctrl->getCmd('showMainAutoScorePage');
 		
 		switch ($cmd)
 		{
