@@ -9,9 +9,9 @@ require_once 'Services/Form/classes/class.ilPropertyFormGUI.php';
  * @author Frank Bauer <frank.bauer@fau.de>
  * @version $Id$
  *
- * @ilCtrl_IsCalledBy ilCodeQuestionESTIntegrationPageGUI: ilUIPluginRouterGUI
+ * @ilCtrl_IsCalledBy ilCodeQuestionScoreIntegrationPageGUI: ilUIPluginRouterGUI
  */
-class ilCodeQuestionESTIntegrationPageGUI
+class ilCodeQuestionScoreIntegrationPageGUI
 {
     /** @var ilCtrl $ctrl */
 	protected $ctrl;
@@ -19,17 +19,17 @@ class ilCodeQuestionESTIntegrationPageGUI
 	/** @var ilTemplate $tpl */
 	protected $tpl;
 
-	/** @var ilCodeQuestionESTIntegrationPlugin $plugin */
+	/** @var ilCodeQuestionScoreIntegrationPlugin $plugin */
 	protected $plugin;
 
 	/** @var ilObjTest $testObj */
 	protected $testObj;
 
-	/** @var ilCodeQuestionESTIntegration $estObj */
+	/** @var ilCodeQuestionScoreIntegration $estObj */
 	protected $estObj;
 
 	/**
-	 * ilCodeQuestionESTIntegrationPageGUI constructor.
+	 * ilCodeQuestionScoreIntegrationPageGUI constructor.
 	 */
 	public function __construct()
 	{
@@ -40,16 +40,16 @@ class ilCodeQuestionESTIntegrationPageGUI
 
 		$lng->loadLanguageModule('assessment');
 
-		$this->plugin = ilPlugin::getPluginObject(IL_COMP_SERVICE, 'UIComponent', 'uihk', 'CodeQuestionESTIntegration');
-		$this->plugin->includeClass('class.ilCodeQuestionESTIntegration.php');
+		$this->plugin = ilPlugin::getPluginObject(IL_COMP_SERVICE, 'UIComponent', 'uihk', 'CodeQuestionScoreIntegration');
+		$this->plugin->includeClass('class.ilCodeQuestionScoreIntegration.php');
 		$this->plugin->loadLanguageModule();
 
 		$this->testObj = new ilObjTest($_GET['ref_id']);
-		$this->estObj = new ilCodeQuestionESTIntegration($this->testObj, $this->plugin);
+		$this->estObj = new ilCodeQuestionScoreIntegration($this->testObj, $this->plugin);
 	}
 
 	private function redirectToIndex(){
-		ilUtil::redirect('ilias.php?baseClass=iluipluginroutergui&cmdNode=we:xh&cmdClass=ilcodequestionestintegrationpagegui&cmd=showMainESTPage&ref_id='.$this->testObj->getRefId());
+		ilUtil::redirect('ilias.php?baseClass=iluipluginroutergui&cmdNode=we:xh&cmdClass=ilCodeQuestionScoreintegrationpagegui&cmd=showMainESTPage&ref_id='.$this->testObj->getRefId());
 	}
 
 	/**
@@ -306,12 +306,12 @@ class ilCodeQuestionESTIntegrationPageGUI
 		global $ilCtrl, $ilDB;
 
 		$data      = $this->testObj->getCompleteEvaluationData(TRUE);
-		$ilCtrl->saveParameterByClass('ilCodeQuestionESTIntegrationPageGUI','ref_id');
+		$ilCtrl->saveParameterByClass('ilCodeQuestionScoreIntegrationPageGUI','ref_id');
 
 		$tpl = $this->plugin->getTemplate('tpl.il_ui_uihk_uicodequestionest_main_page.html');
 		$tpl->setVariable("PARTICIPANT_COUNT", count($data->getParticipants()));
-		$tpl->setVariable("LINK_ZIP", $ilCtrl->getLinkTargetByClass(array('ilUIPluginRouterGUI','ilCodeQuestionESTIntegrationPageGUI')).'&cmd=zip');
-		$tpl->setVariable("LINK_LATEXZIP", $ilCtrl->getLinkTargetByClass(array('ilUIPluginRouterGUI','ilCodeQuestionESTIntegrationPageGUI')).'&cmd=latexZip');
+		$tpl->setVariable("LINK_ZIP", $ilCtrl->getLinkTargetByClass(array('ilUIPluginRouterGUI','ilCodeQuestionScoreIntegrationPageGUI')).'&cmd=zip');
+		$tpl->setVariable("LINK_LATEXZIP", $ilCtrl->getLinkTargetByClass(array('ilUIPluginRouterGUI','ilCodeQuestionScoreIntegrationPageGUI')).'&cmd=latexZip');
 		//echo $this->getFileUploadFormHTML()."<hr>";die;
 		//$upload = $this->getFileUploadForm();
 		$tpl->setVariable("FILE_UPLOAD", $this->getFileUploadForm()->getHTML());

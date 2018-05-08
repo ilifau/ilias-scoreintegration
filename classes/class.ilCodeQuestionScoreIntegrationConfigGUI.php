@@ -9,7 +9,7 @@ include_once("./Services/Component/classes/class.ilPluginConfigGUI.php");
  * @version $Id$
  *
  */
-class ilCodeQuestionESTIntegrationConfigGUI extends ilPluginConfigGUI
+class ilCodeQuestionScoreIntegrationConfigGUI extends ilPluginConfigGUI
 {
 	/**
 	* Handles all commmands, default is "configure"

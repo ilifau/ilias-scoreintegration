@@ -11,7 +11,7 @@ include_once("./Services/UIComponent/classes/class.ilUIHookPluginGUI.php");
  * @version $Id$
  * @ingroup ServicesUIComponent
  */
-class ilCodeQuestionESTIntegrationUIHookGUI extends ilUIHookPluginGUI
+class ilCodeQuestionScoreIntegrationUIHookGUI extends ilUIHookPluginGUI
 {
 
 	/**
@@ -55,15 +55,15 @@ class ilCodeQuestionESTIntegrationUIHookGUI extends ilUIHookPluginGUI
 		// here. So you need to use general GET/POST information
 		// like $_GET["baseClass"], $ilCtrl->getCmdClass/getCmd
 		// to determine the context.
-		print_r($_GET);
+		/*print_r($_GET);
 		echo (strtolower($_GET["cmdClass"]) == 'ilobjtestgui')."<br>";
-		echo $ilCtrl->getCmdClass()."<br>";
+		echo $ilCtrl->getCmdClass()."<br>";*/
 		if ($a_part == "tabs"){
 			// $a_par["tabs"] is ilTabsGUI object
 			if (strtolower($_GET["cmdClass"]) == 'iltestscoringgui' || strtolower($_GET["cmdClass"]) == 'iltestevaluationgui' || strtolower($_GET["cmdClass"]) == 'iltestexportgui'|| strtolower($_GET["cmdClass"]) == 'ilobjtestgui') 
 			{								
-				$ilCtrl->saveParameterByClass('ilCodeQuestionESTIntegrationPageGUI','ref_id');
-				$a_par["tabs"]->addTab("est_integration", $this->plugin_object->txt("est_integration"), $ilCtrl->getLinkTargetByClass(array('ilUIPluginRouterGUI','ilCodeQuestionESTIntegrationPageGUI'), 'showMainESTPage'));
+				$ilCtrl->saveParameterByClass('ilCodeQuestionScoreIntegrationPageGUI','ref_id');
+				$a_par["tabs"]->addTab("score_integration", $this->plugin_object->txt("score_integration"), $ilCtrl->getLinkTargetByClass(array('ilUIPluginRouterGUI','ilCodeQuestionScoreIntegrationPageGUI'), 'showMainESTPage'));
 			}
 		}
 	}

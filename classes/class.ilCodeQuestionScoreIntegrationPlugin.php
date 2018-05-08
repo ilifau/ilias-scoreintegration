@@ -9,11 +9,11 @@ include_once("./Services/UIComponent/classes/class.ilUserInterfaceHookPlugin.php
  * @version $Id$
  *
  */
-class ilCodeQuestionESTIntegrationPlugin extends ilUserInterfaceHookPlugin
+class ilCodeQuestionScoreIntegrationPlugin extends ilUserInterfaceHookPlugin
 {
 	function getPluginName()
 	{
-		return "CodeQuestionESTIntegration";
+		return "CodeQuestionScoreIntegration";
 	}
 }
 

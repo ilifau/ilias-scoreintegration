@@ -12,19 +12,19 @@ require_once './Modules/TestQuestionPool/interfaces/interface.ilObjFileHandlingQ
  * @version $Id$
  *
  */
-class ilCodeQuestionESTIntegration
+class ilCodeQuestionScoreIntegration
 {
 	/** @var ilObjTest $testObj */
 	protected $testObj;
 
-	/** @var ilCodeQuestionESTIntegrationPlugin $plugin */
+	/** @var ilCodeQuestionScoreIntegrationPlugin $plugin */
 	protected $plugin;
 
 	/**
-	 * ilCodeQuestionESTIntegration constructor.
+	 * ilCodeQuestionScoreIntegration constructor.
 	 *
 	 * @param ilObjTest $a_test_obj
-	 * @param ilCodeQuestionESTIntegration $a_plugin
+	 * @param ilCodeQuestionScoreIntegration $a_plugin
 	 */
 	public function __construct($a_test_obj, $a_plugin)
 	{
