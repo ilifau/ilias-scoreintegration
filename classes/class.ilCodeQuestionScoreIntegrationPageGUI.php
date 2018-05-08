@@ -49,7 +49,7 @@ class ilCodeQuestionScoreIntegrationPageGUI
 	}
 
 	private function redirectToIndex(){
-		ilUtil::redirect('ilias.php?baseClass=iluipluginroutergui&cmdNode=we:xh&cmdClass=ilCodeQuestionScoreintegrationpagegui&cmd=showMainESTPage&ref_id='.$this->testObj->getRefId());
+		ilUtil::redirect('ilias.php?baseClass=iluipluginroutergui&cmdNode=we:xh&cmdClass=ilCodeQuestionScoreintegrationpagegui&cmd=showMainAutoScorePage&ref_id='.$this->testObj->getRefId());
 	}
 
 	/**
@@ -76,7 +76,7 @@ class ilCodeQuestionScoreIntegrationPageGUI
 				$this->tpl->setContent($this->uploadFiles());
 				$this->tpl->show();
 				break;
-			case 'showMainESTPage':
+			case 'showMainAutoScorePage':
 				$this->prepareOutput();
 				$this->tpl->setContent($this->overviewContent());
 				$this->tpl->show();
