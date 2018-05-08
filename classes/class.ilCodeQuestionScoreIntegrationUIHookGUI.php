@@ -44,25 +44,31 @@ class ilCodeQuestionScoreIntegrationUIHookGUI extends ilUIHookPluginGUI
 	 */
 	function modifyGUI($a_comp, $a_part, $a_par = array())
 	{
-		/** @var ilCtrl $ilCtrl */
-		/** @var ilTabsGUI $ilTabs */
 		global $ilCtrl, $ilTabs;
-		
-		// tabs hook
-		// note that you currently do not get information in $a_comp
-		// here. So you need to use general GET/POST information
-		// like $_GET["baseClass"], $ilCtrl->getCmdClass/getCmd
-		// to determine the context.
-		print_r($_GET);
-		echo (strtolower($_GET["cmdClass"]) == 'ilobjtestgui')."<br>";
-		echo $ilCtrl->getCmdClass()."<br>";
-		if ($a_part == "tabs"){
-			// $a_par["tabs"] is ilTabsGUI object
-			if (strtolower($_GET["cmdClass"]) == 'iltestscoringgui' || strtolower($_GET["cmdClass"]) == 'iltestevaluationgui' || strtolower($_GET["cmdClass"]) == 'iltestexportgui'|| strtolower($_GET["cmdClass"]) == 'ilobjtestgui') 
-			{								
+
+		switch ($a_part)
+		{
+			// case 'tabs':
+			case 'sub_tabs':
+			if (in_array($ilCtrl->getCmdClass(), array('iltestscoringbyquestionsgui', 'iltestscoringgui')) ) {
 				$ilCtrl->saveParameterByClass('ilCodeQuestionScoreIntegrationPageGUI','ref_id');
 				$a_par["tabs"]->addTab("score_integration", $this->plugin_object->txt("score_integration"), $ilCtrl->getLinkTargetByClass(array('ilUIPluginRouterGUI','ilCodeQuestionScoreIntegrationPageGUI'), 'showMainAutoScorePage'));
+
+				$ilTabs->addSubTabTarget(
+					$this->plugin_object->txt('score_integration'), // text is also the aubtab id
+					$ilCtrl->getLinkTargetByClass(array('ilUIPluginRouterGUI','ilCodeQuestionScoreIntegrationPageGUI'), 'showMainAutoScorePage'),
+					array('showMainAutoScorePage'), // commands to be recognized for activation
+					'ilCodeQuestionScoreIntegrationPageGUI', 	// cmdClass to be recognized activation
+					'', 								// frame
+					false, 								// manual activation
+					true								// text is direct, not a language var
+				);
 			}
+				
+			break;
+
+			default:
+			break;
 		}
 	}
 

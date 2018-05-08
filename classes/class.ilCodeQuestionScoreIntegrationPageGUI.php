@@ -231,8 +231,8 @@ class ilCodeQuestionScoreIntegrationPageGUI
 		}
 		$results = $this->estObj->processZipFile($file['tmp_name']);
 
-		$info_tpl = $this->plugin->getTemplate('tpl.il_ui_uihk_uicodequestionest_succes_info.html');
-		$err_tpl = $this->plugin->getTemplate('tpl.il_ui_uihk_uicodequestionest_fail_info.html');
+		$info_tpl = $this->plugin->getTemplate('tpl.il_ui_uihk_uicodequestionscore_succes_info.html');
+		$err_tpl = $this->plugin->getTemplate('tpl.il_ui_uihk_uicodequestionscore_fail_info.html');
 
 		//SUCCESS		
 		$info_tpl->setCurrentBlock("success_line");
@@ -308,7 +308,7 @@ class ilCodeQuestionScoreIntegrationPageGUI
 		$data      = $this->testObj->getCompleteEvaluationData(TRUE);
 		$ilCtrl->saveParameterByClass('ilCodeQuestionScoreIntegrationPageGUI','ref_id');
 
-		$tpl = $this->plugin->getTemplate('tpl.il_ui_uihk_uicodequestionest_main_page.html');
+		$tpl = $this->plugin->getTemplate('tpl.il_ui_uihk_uicodequestionscore_main_page.html');
 		$tpl->setVariable("PARTICIPANT_COUNT", count($data->getParticipants()));
 		$tpl->setVariable("LINK_ZIP", $ilCtrl->getLinkTargetByClass(array('ilUIPluginRouterGUI','ilCodeQuestionScoreIntegrationPageGUI')).'&cmd=zip');
 		$tpl->setVariable("LINK_LATEXZIP", $ilCtrl->getLinkTargetByClass(array('ilUIPluginRouterGUI','ilCodeQuestionScoreIntegrationPageGUI')).'&cmd=latexZip');
@@ -341,7 +341,7 @@ class ilCodeQuestionScoreIntegrationPageGUI
 		$this->tpl->setTitle($this->testObj->getPresentationTitle());
 		$this->tpl->setDescription($this->testObj->getLongDescription());
 		$this->tpl->setTitleIcon(ilObject::_getIcon('', 'big', 'tst'), $lng->txt('obj_tst'));
-		$this->tpl->addCss($this->plugin->getStyleSheetLocation('uicodequestionest.css'));		
+		$this->tpl->addCss($this->plugin->getStyleSheetLocation('uicodequestionscore.css'));		
 
 		return true;
 	}
