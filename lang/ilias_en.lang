@@ -13,3 +13,10 @@ file_not_found#:#Unable to locate the file.
 error_inconsistent_id#:#Inconsistent IDs
 error_incompatible_question#:#Incompatible Question Type
 archive_file#:#Archive
+label_login#:#Login
+label_reason#:#Reason
+label_points#:#Points
+label_comment#:#Comment
+label_content#:#Content
+h_invalid_comment_file#:#Invalid Comment File
+h_wrong_test#:#Different Test

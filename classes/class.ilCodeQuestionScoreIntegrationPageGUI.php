@@ -234,6 +234,16 @@ class ilCodeQuestionScoreIntegrationPageGUI
 		$info_tpl = $this->plugin->getTemplate('tpl.il_ui_uihk_uicodequestionscore_succes_info.html');
 		$err_tpl = $this->plugin->getTemplate('tpl.il_ui_uihk_uicodequestionscore_fail_info.html');
 
+		$err_tpl->setVariable('LBL_LOGIN', $lng->txt('label_login'));
+		$err_tpl->setVariable('LBL_REASON', $lng->txt('label_reason'));
+		$err_tpl->setVariable('LBL_POINTS', $lng->txt('label_points'));
+		$err_tpl->setVariable('LBL_COMMENT', $lng->txt('label_comment'));
+		$err_tpl->setVariable('LBL_CONTENT', $lng->txt('label_content'));
+		$err_tpl->setVariable('LBL_TESTID', $lng->txt('label_testid'));
+		$err_tpl->setVariable('H_INVALID', $lng->txt('h_invalid_comment_file'));
+		$err_tpl->setVariable('H_OTHER_TEST', $lng->txt('h_wrong_test'));
+
+
 		//SUCCESS		
 		$info_tpl->setCurrentBlock("success_line");
 		$count = 0;
