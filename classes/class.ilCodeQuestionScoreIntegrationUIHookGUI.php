@@ -40,6 +40,19 @@ class ilCodeQuestionScoreIntegrationUIHookGUI extends ilUIHookPluginGUI
 	{
 		return array("mode" => ilUIHookPluginGUI::KEEP, "html" => "");
 	}
+
+	function numberOfCodeQuestions(){
+		global $ilDB;
+		$oID = ilObject::_lookupObjId($_GET['ref_id'])+0;
+		$count = 0;
+		
+		$query = "SELECT count(q.question_id) AS 'nr' FROM qpl_questions AS q LEFT JOIN qpl_qst_type AS t ON q.question_type_fi = t.question_type_id WHERE t.type_tag = 'assCodeQuestion' AND obj_fi = $oID";
+		$result = $ilDB->query($query);
+		while ($row = $ilDB->fetchAssoc($result)){ $count = $row['nr']+0; }
+	
+		//echo "r=".$_GET['ref_id'].", 0=$oID, count=$count<br>$query";die;
+		return $count;
+	}
 	
 	/**
 	 * Modify GUI objects, before they generate ouput
@@ -58,19 +71,7 @@ class ilCodeQuestionScoreIntegrationUIHookGUI extends ilUIHookPluginGUI
 			case 'sub_tabs':
 			if (in_array($ilCtrl->getCmdClass(), array('iltestscoringbyquestionsgui', 'iltestscoringgui')) ) {
 				if (!$this->hasCodeQuestions) {
-					$test = new ilObjTest($_GET['ref_id']);
-
-					//see if we have source Code questions available
-					$questions = $test->getQuestions();
-					foreach ($questions as $q) {
-						$question =& ilObjTest::_instanciateQuestion($q);
-						if (method_exists($question, 'getCompleteSource') && 
-							method_exists($question, 'getExportFilename') &&
-							method_exists($question, 'getExportSolution')){
-								$this->hasCodeQuestions = true;
-								break;
-							}
-					}
+					$this->hasCodeQuestions = $this->numberOfCodeQuestions()>0;					
 				}
 				if (!$this->hasCodeQuestions) return;
 				
