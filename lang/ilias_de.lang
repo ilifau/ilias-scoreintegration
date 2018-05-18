@@ -13,3 +13,23 @@ file_not_found#:#Die Datei wurde nicht gefunden.
 error_inconsistent_id#:#Fehlerhafte IDs
 error_incompatible_question#:#Nicht unterstützter Fragetyp
 archive_file#:#Archiv
+label_login#:#Login
+label_reason#:#Beschreibung
+label_points#:#Punkte
+label_comment#:#Kommentar
+label_content#:#Inhalt
+label_testid#:#Test ID
+h_invalid_comment_file#:#Ungültige Kommentar Datei
+h_wrong_test#:#Falscher Test
+h_unprocessed#:#Unverarbeitete Einträge
+h_stored#:#Gespeicherte Einträge
+h_solution_archive#:#Ergebnis-Archiv
+html_solution_archive#:#Erzeugt ein archiv mit allen Quellcode-Fragen dieses Tests. Das Archive enthält pro Antwort eine <em>_comment</em>-Datei mit den aktuell eingetragenen Punkten und dem Kommentar. Um diese Information bei einem späteren import automatisiert für alle Teilnehmenden zu verändern muss für jede zu verändernde Antwort eine analog aufgebaute <em>comment</em>-Datei im hochgeladenen Archiv enthalten sein.
+lnk_solution_archive#:#Archiv Herunterladen
+h_tex#:#Latex Zip
+html_tex#:#Erzeugt ein Archiv das für jede Antwort zu einer Quellcode-Aufgabe im Test eine Latex-Datei erzeugt.
+lnk_tex#:#Latex-Projekt Herunterladen
+h_upload#:#Ergebnis-Archiv Hochladen
+html_upload#:#Verarbeitet die <em>comment</em>-Dateien aus dem hochgeladenen Archiv und trägt für diesen Test die darin enthaltenen manuellen bewertungen ein.
+title#:#Automatisierte Bewertung
+h_nr_participants#:#Anzahl der Teilnehmer
