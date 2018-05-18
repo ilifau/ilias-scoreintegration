@@ -234,6 +234,18 @@ class ilCodeQuestionScoreIntegrationPageGUI
 		$info_tpl = $this->plugin->getTemplate('tpl.il_ui_uihk_uicodequestionscore_succes_info.html');
 		$err_tpl = $this->plugin->getTemplate('tpl.il_ui_uihk_uicodequestionscore_fail_info.html');
 
+		$err_tpl->setVariable('LBL_LOGIN', $this->plugin->txt('label_login'));
+		$err_tpl->setVariable('LBL_REASON', $this->plugin->txt('label_reason'));
+		$err_tpl->setVariable('LBL_POINTS', $this->plugin->txt('label_points'));
+		$err_tpl->setVariable('LBL_COMMENT', $this->plugin->txt('label_comment'));
+		$err_tpl->setVariable('LBL_CONTENT', $this->plugin->txt('label_content'));
+		$err_tpl->setVariable('LBL_TESTID', $this->plugin->txt('label_testid'));
+		$err_tpl->setVariable('H_INVALID', $this->plugin->txt('h_invalid_comment_file'));
+		$err_tpl->setVariable('H_OTHER_TEST', $this->plugin->txt('h_wrong_test'));
+		$err_tpl->setVariable('H_UNPROCESSED', $this->plugin->txt('h_unprocessed'));
+		$err_tpl->setVariable('H_STORED', $this->plugin->txt('h_stored'));
+
+
 		//SUCCESS		
 		$info_tpl->setCurrentBlock("success_line");
 		$count = 0;
@@ -245,6 +257,11 @@ class ilCodeQuestionScoreIntegrationPageGUI
 				$info_tpl->setVariable("LOGIN", $file['login']);
 				$info_tpl->setVariable("POINTS", $file['points']);
 				$info_tpl->setVariable("COMMENT", $file['comment']);
+				$info_tpl->setVariable('LBL_LOGIN', $this->plugin->txt('label_login'));
+				$info_tpl->setVariable('LBL_POINTS', $this->plugin->txt('label_points'));
+				$info_tpl->setVariable('LBL_COMMENT', $this->plugin->txt('label_comment'));
+				$info_tpl->setVariable('H_UNPROCESSED', $this->plugin->txt('h_unprocessed'));
+				
 				$info_tpl->parseCurrentBlock();
 			} else {
 				$countu++;
@@ -303,7 +320,7 @@ class ilCodeQuestionScoreIntegrationPageGUI
 	}
 
 	protected function overviewTemplate(){
-		global $ilCtrl, $ilDB;
+		global $ilCtrl, $ilDB, $lng;
 
 		$data      = $this->testObj->getCompleteEvaluationData(TRUE);
 		$ilCtrl->saveParameterByClass('ilCodeQuestionScoreIntegrationPageGUI','ref_id');
@@ -315,6 +332,17 @@ class ilCodeQuestionScoreIntegrationPageGUI
 		//echo $this->getFileUploadFormHTML()."<hr>";die;
 		//$upload = $this->getFileUploadForm();
 		$tpl->setVariable("FILE_UPLOAD", $this->getFileUploadForm()->getHTML());
+
+		$tpl->setVariable('TITLE', $this->plugin->txt('title'));
+		$tpl->setVariable('P_COUNT', $this->plugin->txt('h_nr_participants'));
+		$tpl->setVariable('H_ARCH', $this->plugin->txt('h_solution_archive'));
+		$tpl->setVariable('TXT_ARCH', $this->plugin->txt('html_solution_archive'));
+		$tpl->setVariable('DNL_ARCH', $this->plugin->txt('lnk_solution_archive'));
+		$tpl->setVariable('H_TEX', $this->plugin->txt('h_tex'));
+		$tpl->setVariable('TXT_TEX', $this->plugin->txt('html_tex'));
+		$tpl->setVariable('DNL_TEX', $this->plugin->txt('lnk_tex'));
+		$tpl->setVariable('H_UPLOAD', $this->plugin->txt('h_upload'));
+		$tpl->setVariable('TXT_UPLOAD', $this->plugin->txt('html_upload'));
 		return $tpl;
 	}
 
