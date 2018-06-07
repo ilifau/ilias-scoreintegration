@@ -307,7 +307,7 @@ class ilCodeQuestionScoreIntegration
 				}
 			}
 			$stringP = $this->finishParticipantString($stringP);
-			$file = sprintf($tempBase . "/%s.tex", $usrInfo);
+			$file = $tempBase . sprintf("/%s.tex", $usrInfo.'');
 			$zip->addFromString($file, $stringP);
 		}
 		$zip->close();
@@ -347,8 +347,8 @@ class ilCodeQuestionScoreIntegration
 		return $string;
 	}
 
-	protected function addQuestionToString($string, $question, $code) {
-		$string = sprintf($string . 
+	protected function addQuestionToString($string, $question, $code) {	
+		$string = $string .sprintf( 
 					"\\rhead{%s}\n" .
 					"\\begin{lstlisting}\n" .
 					"%s \n".
@@ -359,7 +359,7 @@ class ilCodeQuestionScoreIntegration
 	}
 
 	protected function finishParticipantString($string) {
-		$string = sprintf($string . 
+		$string = $string . sprintf( 
 					"\\end{document}"
 				);
 		return $string;
