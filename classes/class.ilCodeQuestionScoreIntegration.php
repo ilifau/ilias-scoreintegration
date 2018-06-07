@@ -158,7 +158,7 @@ class ilCodeQuestionScoreIntegration
 					$result['wrongTest'][] = $obj;
 				} else {
 					$obj['points'] = (float)$matches[1][0];
-					$obj['comment'] = trim($matches[3][0]);
+					$obj['comment'] = '<pre style="font-family:monospace">'.trim($matches[3][0]).'</pre>';
 					$obj['stored'] = false;
 					$result['files'][] = $obj;			
 				}
