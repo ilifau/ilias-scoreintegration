@@ -224,6 +224,10 @@ class ilCodeQuestionScoreIntegration
 						method_exists($objQuestion, 'getExportSolution')){
 						$filename = $objQuestion->getExportFilename();
 						$solution = $objQuestion->getExportSolution($active_id, $pass);
+						
+						//ignore invalid solution
+						if ($solution == null) continue;
+
 						$code = $objQuestion->getCompleteSource($solution);
 
 						$subFolder = sprintf("solution-%06d-%06d-%06d-%06d-%s", $solution['solution_id'], $solution['active_fi'], $solution['pass'], $userdata->user_id, $userdata->login);
