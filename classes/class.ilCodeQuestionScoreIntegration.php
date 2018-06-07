@@ -380,7 +380,7 @@ class ilCodeQuestionScoreIntegration
 		$result = $ilDB->query($query);
 
 		while($row = $ilDB->fetchAssoc($result)) {
-			return $row['lastname'] . ',' .$row['firstname'] . '(' . $row['login'] . ',' . $row['matriculation'] . ')';
+			return $row['lastname'] . '-' .$row['firstname'] . '-' . $row['login'] . '-' . $row['matriculation'];
 		}
 
 		return 0;
