@@ -256,7 +256,7 @@ class ilCodeQuestionScoreIntegrationPageGUI
 				
 				$info_tpl->setVariable("LOGIN", $file['login']);
 				$info_tpl->setVariable("POINTS", $file['points']);
-				$info_tpl->setVariable("COMMENT", ''/*$file['comment']*/);
+				$info_tpl->setVariable("COMMENT", $file['comment']);
 				$info_tpl->setVariable('LBL_LOGIN', $this->plugin->txt('label_login'));
 				$info_tpl->setVariable('LBL_POINTS', $this->plugin->txt('label_points'));
 				$info_tpl->setVariable('LBL_COMMENT', $this->plugin->txt('label_comment'));
