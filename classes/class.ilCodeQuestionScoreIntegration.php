@@ -511,6 +511,8 @@ class ilCodeQuestionScoreIntegration
 			$solution['question_fi'],
 			$solution["pass"]
 		);
+		$feedback = str_replace('<pre style="font-family:monospace">', '', $feedback);
+		$feedback = str_replace('</pre>', '', $feedback);
 		$points = $this->getReachedPoints(
 			$solution['active_fi'], 
 			$solution['question_fi'],
