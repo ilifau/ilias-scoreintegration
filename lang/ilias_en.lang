@@ -33,3 +33,5 @@ h_upload#:#Upload Solution-Archive
 html_upload#:#Upload a solution-archive and read the results from the included <em>comment</em>-files.
 title#:#Auto Score Integration
 h_nr_participants#:#Number of Participants
+log_import_score#:#%s imported the score %s points for participant %s and question %s.
+log_recalculated_solutions#:#Die Testergebnisse wurden neu berechnet.
