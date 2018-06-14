@@ -465,7 +465,10 @@ class ilCodeQuestionScoreIntegration
 					"\usepackage{lastpage}" .
 					"\\usepackage{listings}\n" .
 					"\\usepackage{color}\n\n" .
-					"\\definecolor{light-gray}{gray}{0.85}\n\n" .
+					"\\definecolor{light-gray}{gray}{0.85}\n" .
+					"\\makeatletter\n" .
+					"\\def\\verbatim@font{\\linespread{1}\\normalfont\\ttfamily}\n" .
+					"\\makeatother\n\n" .
 					"\\lstset{ \n" .
 						"\t language=Java,\n" .
 						"\t breakatwhitespace=false,\n" . 
@@ -499,7 +502,8 @@ class ilCodeQuestionScoreIntegration
 	protected function addQuestionToString($string, $question, $code) {	
 		$string = $string .sprintf( 
 					"\\rhead{%s}\n" .
-					"%s \n" ,
+					"%s \n".
+					"\\newpage \n\n" ,
 					$question, $code);
 		return $string;
 	}
