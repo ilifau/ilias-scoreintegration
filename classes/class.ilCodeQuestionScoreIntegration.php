@@ -419,6 +419,7 @@ class ilCodeQuestionScoreIntegration
 					$code = $this->buildCode($objQuestion, $solution);
 					$questionString = sprintf("question-%06d", $question["id"]);
 					$stringP = $this->addQuestionToString($stringP, $questionString, $code);
+					$stringP = $this->addTestResultToString($stringP, $solution);
 				}
 			}
 			$stringP = $this->finishParticipantString($stringP);
@@ -464,7 +465,10 @@ class ilCodeQuestionScoreIntegration
 					"\usepackage{lastpage}" .
 					"\\usepackage{listings}\n" .
 					"\\usepackage{color}\n\n" .
-					"\\definecolor{light-gray}{gray}{0.85}\n\n" .
+					"\\definecolor{light-gray}{gray}{0.85}\n" .
+					"\\makeatletter\n" .
+					"\\def\\verbatim@font{\\linespread{1}\\normalfont\\ttfamily}\n" .
+					"\\makeatother\n\n" .
 					"\\lstset{ \n" .
 						"\t language=Java,\n" .
 						"\t breakatwhitespace=false,\n" . 
@@ -501,6 +505,27 @@ class ilCodeQuestionScoreIntegration
 					"%s \n".
 					"\\newpage \n\n" ,
 					$question, $code);
+		return $string;
+	}
+
+	protected function addTestResultToString($string, $solution) {	
+		$feedback = $this->testObj->getManualFeedback(
+			$solution['active_fi'], 
+			$solution['question_fi'],
+			$solution["pass"]
+		);
+		$feedback = str_replace('<pre style="font-family:monospace">', '', $feedback);
+		$feedback = str_replace('</pre>', '', $feedback);
+		$points = $this->getReachedPoints(
+			$solution['active_fi'], 
+			$solution['question_fi'],
+			$solution["pass"]
+		);
+
+		$comment = "POINTS: %3.1f\n%s\n";
+		$comment = sprintf($comment, $points, $feedback);						
+		$string = $string .'\\begin{verbatim}'.$comment.'\\end{verbatim}'.
+		"\\newpage \n\n";
 		return $string;
 	}
 
