@@ -419,6 +419,7 @@ class ilCodeQuestionScoreIntegration
 					$code = $this->buildCode($objQuestion, $solution);
 					$questionString = sprintf("question-%06d", $question["id"]);
 					$stringP = $this->addQuestionToString($stringP, $questionString, $code);
+					$stringP = $this->addTestResultToString($stringP, $solution);
 				}
 			}
 			$stringP = $this->finishParticipantString($stringP);
@@ -501,6 +502,24 @@ class ilCodeQuestionScoreIntegration
 					"%s \n".
 					"\\newpage \n\n" ,
 					$question, $code);
+		return $string;
+	}
+
+	protected function addTestResultToString($string, $solution) {	
+		$feedback = $this->testObj->getManualFeedback(
+			$solution['active_fi'], 
+			$solution['question_fi'],
+			$solution["pass"]
+		);
+		$points = $this->getReachedPoints(
+			$solution['active_fi'], 
+			$solution['question_fi'],
+			$solution["pass"]
+		);
+
+		$comment = "POINTS: %3.1f\n%s\n";
+		$comment = sprintf($comment, $points, $feedback);						
+		$string = $string .'\\begin{verbatim}'.$comment.'\\end{verbatim}';
 		return $string;
 	}
 
