@@ -499,8 +499,7 @@ class ilCodeQuestionScoreIntegration
 	protected function addQuestionToString($string, $question, $code) {	
 		$string = $string .sprintf( 
 					"\\rhead{%s}\n" .
-					"%s \n".
-					"\\newpage \n\n" ,
+					"%s \n" ,
 					$question, $code);
 		return $string;
 	}
@@ -521,7 +520,8 @@ class ilCodeQuestionScoreIntegration
 
 		$comment = "POINTS: %3.1f\n%s\n";
 		$comment = sprintf($comment, $points, $feedback);						
-		$string = $string .'\\begin{verbatim}'.$comment.'\\end{verbatim}';
+		$string = $string .'\\begin{verbatim}'.$comment.'\\end{verbatim}'.
+		"\\newpage \n\n";
 		return $string;
 	}
 
