@@ -415,8 +415,8 @@ class ilCodeQuestionScoreIntegration
 				if (method_exists($objQuestion, 'getCompleteSource') && 
 					method_exists($objQuestion, 'getExportSolution')) {
 						
-					$solution = $objQuestion->getExportSolution($active_id, $pass);
-					$code = $objQuestion->getCompleteSource($solution);
+					$solution = $objQuestion->getExportSolution($active_id, $pass);					
+					$code = $this->buildCode($objQuestion, $solution);
 					$questionString = sprintf("question-%06d", $question["id"]);
 					$stringP = $this->addQuestionToString($stringP, $questionString, $code);
 				}
@@ -429,6 +429,32 @@ class ilCodeQuestionScoreIntegration
 
 		return NULL;
 	}
+	protected function buildCode($objQuestion, $solution) {
+		$studentCode = $objQuestion->prepareSolutionData($solution);
+	
+		$res = '';
+		$justCode = '';
+		$line = 1;
+		for ($i=0; $i<$objQuestion->getNumberOfBlocks(); $i++){
+			$t = $objQuestion->getTypeForBlock($i);
+			if ($t == assCodeQuestionBlockTypes::SolutionCode) {
+				$res .= '\\begin{lstlisting}[firstnumber='.$line.', frame=single]'."\n";						
+				if (!empty($studentCode)){
+					$res .= $studentCode->$i."\n";
+					$justCode .= $studentCode->$i."\n";
+				}	
+				$res .= '\\end{lstlisting}'."\n";			
+			} else if ($t == assCodeQuestionBlockTypes::StaticCode || $t== assCodeQuestionBlockTypes::HiddenCode) {
+				$res .= '\\begin{lstlisting}[firstnumber='.$line.', basicstyle=\\linespread{0.8}\\sffamily]'."\n";				
+				$res .= $objQuestion->getContentForBlock($i)."\n";
+				$justCode .= $objQuestion->getContentForBlock($i)."\n";
+				$res .= '\\end{lstlisting}'."\n";
+			}
+
+			$line = count(explode("\n", $justCode));
+		}
+		return $res;
+	}
 
 	protected function initParticipantString($participant, $test) {
 		$string = sprintf("\\documentclass[landscape]{article}\n\n" .
@@ -438,6 +464,7 @@ class ilCodeQuestionScoreIntegration
 					"\usepackage{lastpage}" .
 					"\\usepackage{listings}\n" .
 					"\\usepackage{color}\n\n" .
+					"\\definecolor{light-gray}{gray}{0.85}\n\n" .
 					"\\lstset{ \n" .
 						"\t language=Java,\n" .
 						"\t breakatwhitespace=false,\n" . 
@@ -446,9 +473,15 @@ class ilCodeQuestionScoreIntegration
 						"\t keepspaces=true,\n" . 
 						"\t numbers=left, \n" . 
 						"\t showspaces=false,\n" .
-						"\t showstringspaces=false,\n" .
+						"\t showstringspaces=true,\n" .
 						"\t showtabs=false,\n" .
-						"\t tabsize=2\n" .
+						"\t tabsize=4,\n" .
+						"\t showlines=true,\n" .
+						"\t basicstyle=\\linespread{1.5}\\ttfamily,\n" .
+						"\t keywordstyle=\\color{blue}\\ttfamily,\n" .
+						"\t stringstyle=\\color{red}\\ttfamily,\n" .
+						"\t commentstyle=\\color{light-gray}\\ttfamily,\n" .
+						"\t morecomment=[l][\\color{light-gray}]\n" .
 					"}\n\n" .
 					"\\usepackage{fancyhdr}\n" .
 					"\\pagestyle{fancy}\n" .
@@ -465,9 +498,7 @@ class ilCodeQuestionScoreIntegration
 	protected function addQuestionToString($string, $question, $code) {	
 		$string = $string .sprintf( 
 					"\\rhead{%s}\n" .
-					"\\begin{lstlisting}\n" .
 					"%s \n".
-					"\\end{lstlisting}\n\n" .
 					"\\newpage \n\n" ,
 					$question, $code);
 		return $string;
