@@ -33,3 +33,5 @@ h_upload#:#Ergebnis-Archiv Hochladen
 html_upload#:#Verarbeitet die <em>comment</em>-Dateien aus dem hochgeladenen Archiv und trägt für diesen Test die darin enthaltenen manuellen bewertungen ein.
 title#:#Automatisierte Bewertung
 h_nr_participants#:#Anzahl der Teilnehmer
+log_import_score#:#%s hat die Bewertung %s Punkte für den Teilnehmer %s und die Frage %s importiert.
+log_recalculated_solutions#:#Die Testergebnisse wurden neu berechnet.
