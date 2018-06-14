@@ -256,7 +256,7 @@ class ilCodeQuestionScoreIntegration
 					$result['wrongTest'][] = $obj;
 				} else {
 					$obj['points'] = (float)$matches[1][0];
-					$obj['comment'] = trim($matches[3][0]);
+					$obj['comment'] = '<pre style="font-family:monospace">'.trim($matches[3][0]).'</pre>';
 					$obj['stored'] = false;
 					$result['files'][] = $obj;			
 				}
@@ -335,6 +335,10 @@ class ilCodeQuestionScoreIntegration
 						method_exists($objQuestion, 'getExportSolution')){
 						$filename = $objQuestion->getExportFilename();
 						$solution = $objQuestion->getExportSolution($active_id, $pass);
+						
+						//ignore invalid solution
+						if ($solution == null) continue;
+
 						$code = $objQuestion->getCompleteSource($solution);
 
 						$subFolder = sprintf("solution-%06d-%06d-%06d-%06d-%s", $solution['solution_id'], $solution['active_fi'], $solution['pass'], $userdata->user_id, $userdata->login);
@@ -418,7 +422,7 @@ class ilCodeQuestionScoreIntegration
 				}
 			}
 			$stringP = $this->finishParticipantString($stringP);
-			$file = sprintf($tempBase . "/%s.tex", $usrInfo);
+			$file = $tempBase . sprintf("/%s.tex", $usrInfo.'');
 			$zip->addFromString($file, $stringP);
 		}
 		$zip->close();
@@ -458,8 +462,8 @@ class ilCodeQuestionScoreIntegration
 		return $string;
 	}
 
-	protected function addQuestionToString($string, $question, $code) {
-		$string = sprintf($string . 
+	protected function addQuestionToString($string, $question, $code) {	
+		$string = $string .sprintf( 
 					"\\rhead{%s}\n" .
 					"\\begin{lstlisting}\n" .
 					"%s \n".
@@ -470,7 +474,7 @@ class ilCodeQuestionScoreIntegration
 	}
 
 	protected function finishParticipantString($string) {
-		$string = sprintf($string . 
+		$string = $string . sprintf( 
 					"\\end{document}"
 				);
 		return $string;
@@ -487,7 +491,7 @@ class ilCodeQuestionScoreIntegration
 		$result = $ilDB->query($query);
 
 		while($row = $ilDB->fetchAssoc($result)) {
-			return $row['lastname'] . ',' .$row['firstname'] . '(' . $row['login'] . ',' . $row['matriculation'] . ')';
+			return $row['lastname'] . '-' .$row['firstname'] . '-' . $row['login'] . '-' . $row['matriculation'];
 		}
 
 		return 0;
