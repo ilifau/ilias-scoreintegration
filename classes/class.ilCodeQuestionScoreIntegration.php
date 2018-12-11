@@ -291,8 +291,14 @@ class ilCodeQuestionScoreIntegration
 				$objQuestion = $this->testObj->_instanciateQuestion($obj["questionID"]);
 				$questions[$obj["questionID"]] = $objQuestion;
 			}
+			$solution = null;
 			if (method_exists($objQuestion, 'getExportSolution') ){
 				$solution = $objQuestion->getExportSolution($obj["activeID"], $obj["pass"]);
+			} else {
+				$solutions = $objQuestion->getSolutionValues($obj["activeID"], $obj["pass"]);
+				if (count($solutions)>0) $solution = $solutions[count($solutions)-1];	
+			}
+			if ($solution != null) {
 				if ($solution['solution_id'] == $obj["solutionID"] && 
 					$solution['active_fi'] == $obj["activeID"] &&
 					$solution['question_fi'] == $obj["questionID"] &&
