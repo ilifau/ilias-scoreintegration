@@ -330,7 +330,22 @@ class ilCodeQuestionScoreIntegration
 						$objQuestion = $this->testObj->_instanciateQuestion($question["id"]);
 						$questions[$question["id"]] = $objQuestion;
 					}
-					if (method_exists($objQuestion, 'getCompleteSource') && 
+					if (method_exists($objQuestion, 'getOrderingElements')){							
+						$json = $this->jsonFromHorizOrderingQuestion( $objQuestion, $active_id, $pass );														
+						$subFolder = $this->createCommentFile(
+							$zip, $userdata, $questionBase, 
+							$objQuestion, $active_id, $pass, $solution);
+
+						$zip->addFromString($subFolder.'/order.json', $json.'');
+					} else if (method_exists($objQuestion, 'getOrderingElementList')){						
+						$json = $this->jsonFromOrderingQuestion( $objQuestion, $active_id, $pass );								
+						
+						$subFolder = $this->createCommentFile(
+							$zip, $userdata, $questionBase, 
+							$objQuestion, $active_id, $pass, $solution);
+
+						$zip->addFromString($subFolder.'/order.json', $json.'');						
+					} else if (method_exists($objQuestion, 'getCompleteSource') && 
 						method_exists($objQuestion, 'getExportFilename') &&
 						method_exists($objQuestion, 'getExportSolution')){
 						$filename = $objQuestion->getExportFilename();
@@ -341,25 +356,11 @@ class ilCodeQuestionScoreIntegration
 
 						$code = $objQuestion->getCompleteSource($solution);
 
-						$subFolder = sprintf("solution-%06d-%06d-%06d-%06d-%s", $solution['solution_id'], $solution['active_fi'], $solution['pass'], $userdata->user_id, $userdata->login);
-						$subFolder = $questionBase.'/'.preg_replace('/[^A-Za-z0-9_\-]/', '', $subFolder);
+						$subFolder = $this->createCommentFile(
+							$zip, $userdata, $questionBase, 
+							$objQuestion, $active_id, $pass, $solution);
+
 						$zip->addFromString($subFolder.'/'.$filename, $code);
-
-						
-						$feedback = $this->testObj->getManualFeedback(
-							$solution['active_fi'], 
-							$solution['question_fi'],
-							$solution["pass"]
-						);
-						$points = $this->getReachedPoints(
-							$solution['active_fi'], 
-							$solution['question_fi'],
-							$solution["pass"]
-						);
-
-						$comment = "POINTS: %3.1f\n%s\n";
-						$comment = sprintf($comment, $points, $feedback);						
-						$zip->addFromString($subFolder.'/comment_', $comment);
 					}
 				}
 				// Access some user related properties
@@ -368,6 +369,83 @@ class ilCodeQuestionScoreIntegration
 		$zip->close();
 
 		return NULL;
+	}
+	protected function jsonFromHorizOrderingQuestion($objQuestion, $active_id, $pass){
+		$soll = $objQuestion->getOrderingElements();
+		$ist = array();
+
+		$solution = $objQuestion->getSolutionValues($active_id, $pass);			
+		if (count($solution)>0){
+			if (strlen($solution[0]["value1"])){
+				$ist = explode("{::}", $solution[0]["value1"]);
+			}
+		}
+
+		$mapSoll = array();
+		$mapIst = array();
+		foreach($soll as $k=>$v) {			
+			$mapSoll[$k] = $v;
+		}
+		foreach($ist as $k=>$v) {			
+			$mapIst[$k] = $v;
+		}
+		
+		$map = array('solution'=>$mapSoll, 'student'=>$mapIst);
+		$map['max_points'] = $objQuestion->getPoints();
+		return json_encode($map);
+	}
+
+	protected function jsonFromOrderingQuestion($objQuestion, $active_id, $pass){
+		$soll = $objQuestion->getOrderingElementList();
+		$ist = array();
+
+		$indexedSolutionValues = $objQuestion->fetchIndexedValuesFromValuePairs(
+			$objQuestion->getTestOutputSolutions($active_id, $pass)							
+		);						
+		if( count($indexedSolutionValues) ) {
+			$ist = $objQuestion->getSolutionOrderingElementList($indexedSolutionValues);			
+		}
+
+
+		$mapSoll = array();
+		$mapIst = array();
+		foreach($soll as $k=>$v) {			
+			$mapSoll[$k] = $v->getContent();
+		}
+		foreach($ist as $k=>$v) {			
+			$mapIst[$k] = $v->getContent();
+		}
+		
+		$map = array('solution'=>$mapSoll, 'student'=>$mapIst);
+		$map['max_points'] = $objQuestion->getPoints();
+		return json_encode($map);		
+	}
+
+	protected function createCommentFile($zip, $userdata, $questionBase, $objQuestion, $active_id, $pass, $solution=null){
+
+		if ($solution == null) {
+			$solution = $objQuestion->getSolutionValues($active_id, $pass);
+			if (count($solution)>0) $solution = $solution[count($solution)-1];			
+		}
+		$subFolder = sprintf("solution-%06d-%06d-%06d-%06d-%s", $solution['solution_id'], $solution['active_fi'], $solution['pass'],$userdata->user_id, $userdata->login);
+		$subFolder = $questionBase.'/'.preg_replace('/[^A-Za-z0-9_\-]/', '', $subFolder);
+		
+		$feedback = $this->testObj->getManualFeedback(
+			$solution['active_fi'], 
+			$solution['question_fi'],
+			$solution["pass"]
+		);
+		$points = $this->getReachedPoints(
+			$solution['active_fi'], 
+			$solution['question_fi'],
+			$solution["pass"]
+		);
+
+		$comment = "POINTS: %3.1f\n%s\n";
+		$comment = sprintf($comment, $points, $feedback);						
+		$zip->addFromString($subFolder.'/comment_', $comment);
+
+		return $subFolder ;
 	}
 
 	protected function getReachedPoints($active_fi, $question_fi, $pass){
