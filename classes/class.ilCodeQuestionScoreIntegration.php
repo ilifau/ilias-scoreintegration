@@ -367,6 +367,21 @@ class ilCodeQuestionScoreIntegration
 							$objQuestion, $active_id, $pass, $solution);
 
 						$zip->addFromString($subFolder.'/'.$filename, $code);
+
+						//generate files for each block
+						$studentCode = $objQuestion->prepareSolutionData($solution);
+						for ($i=0; $i<$objQuestion->getNumberOfBlocks(); $i++){
+							$t = $objQuestion->getTypeForBlock($i);							
+							if ($t == assCodeQuestionBlockTypes::SolutionCode) {
+								$c = '';
+								if (!empty($studentCode)) $c = $studentCode->$i;
+								$zip->addFromString($subFolder.'/'.$i.'.solution.'.$filename, $c);
+							} else if ($t == assCodeQuestionBlockTypes::StaticCode) {
+								$zip->addFromString($subFolder.'/'.$i.'.static.'.$filename, $objQuestion->getContentForBlock($i));
+							} else if ($t == assCodeQuestionBlockTypes::HiddenCode) {
+								$zip->addFromString($subFolder.'/'.$i.'.hidden.'.$filename, $objQuestion->getContentForBlock($i));	
+							}								
+						}
 					}
 				}
 				// Access some user related properties

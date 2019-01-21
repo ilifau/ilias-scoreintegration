@@ -46,7 +46,7 @@ class ilCodeQuestionScoreIntegrationUIHookGUI extends ilUIHookPluginGUI
 		$oID = ilObject::_lookupObjId($_GET['ref_id'])+0;
 		$count = 0;
 		
-		$query = "SELECT count(q.question_id) AS 'nr' FROM qpl_questions AS q LEFT JOIN qpl_qst_type AS t ON q.question_type_fi = t.question_type_id WHERE t.type_tag = 'assCodeQuestion' AND obj_fi = $oID";
+		$query = "SELECT count(q.question_id) AS 'nr' FROM qpl_questions AS q LEFT JOIN qpl_qst_type AS t ON q.question_type_fi = t.question_type_id WHERE (t.type_tag = 'assCodeQuestion' OR t.type_tag = 'assOrderingHorizontal' OR t.type_tag = 'assOrderingQuestion')AND obj_fi = $oID";
 		$result = $ilDB->query($query);
 		while ($row = $ilDB->fetchAssoc($result)){ $count = $row['nr']+0; }
 	
