@@ -2,21 +2,11 @@
 
 **Author**:   Frank Bauer <frank.bauer@fau.de>
 
-**Version**:  1.0.1
+**Version**:  1.0.2
 
 **Company**:  Computer Graphics Group Erlangen
 
-**Supports**: ILIAS 5.1 - 5.2
-
-# ILIAS Code Question Plugin
-
-**Author**:   Frank Bauer <frank.bauer@fau.de>
-
-**Version**:  1.1.1
-
-**Company**:  Computer Graphics Group Erlangen
-
-**Supports**: ILIAS 5.1 - 5.1
+**Supports**: ILIAS 5.1 - 5.3
 
 ## License
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
@@ -40,3 +30,8 @@ CodeQuestionScoreIntegration` directory to your ILIAS installation at the follow
 5. Choose **Refresh** for the `CodeQuestionScoreIntegration` plugin languages
 
 There is nothing to configure for this plugin.
+
+## Version History
+### Version 1.0.2
+* Exporting all code blocks to seperate files.
+* Export json for vertical/horizontal ordering question type
