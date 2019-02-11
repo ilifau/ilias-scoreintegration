@@ -340,7 +340,7 @@ class ilCodeQuestionScoreIntegration
 						$json = $this->jsonFromHorizOrderingQuestion( $objQuestion, $active_id, $pass );														
 						$subFolder = $this->createCommentFile(
 							$zip, $userdata, $questionBase, 
-							$objQuestion, $active_id, $pass, $solution);
+							$objQuestion, $active_id, $pass, null);
 
 						$zip->addFromString($subFolder.'/order.json', $json.'');
 					} else if (method_exists($objQuestion, 'getOrderingElementList')){						
@@ -348,7 +348,7 @@ class ilCodeQuestionScoreIntegration
 						
 						$subFolder = $this->createCommentFile(
 							$zip, $userdata, $questionBase, 
-							$objQuestion, $active_id, $pass, $solution);
+							$objQuestion, $active_id, $pass, null);
 
 						$zip->addFromString($subFolder.'/order.json', $json.'');						
 					} else if (method_exists($objQuestion, 'getCompleteSource') && 
