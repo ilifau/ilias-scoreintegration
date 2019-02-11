@@ -2,7 +2,7 @@
 
 **Author**:   Frank Bauer <frank.bauer@fau.de>
 
-**Version**:  1.0.2
+**Version**:  1.0.3
 
 **Company**:  Computer Graphics Group Erlangen
 
@@ -32,6 +32,8 @@ CodeQuestionScoreIntegration` directory to your ILIAS installation at the follow
 There is nothing to configure for this plugin.
 
 ## Version History
+### Version 1.0.3
+* Bugfix for ordering export
 ### Version 1.0.2
 * Exporting all code blocks to seperate files.
 * Export json for vertical/horizontal ordering question type
