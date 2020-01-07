@@ -356,12 +356,21 @@ class ilCodeQuestionScoreIntegration
 						method_exists($objQuestion, 'getExportSolution')){
 						$filename = $objQuestion->getExportFilename();
 						$solution = $objQuestion->getExportSolution($active_id, $pass);
-						
+												
 						//ignore invalid solution
 						if ($solution == null) continue;
 
-						$code = $objQuestion->getCompleteSource($solution);
+						// //the latest pass has no data, find one that has...
+						// while ((!isset($solution["solution_id"])) && $pass>0) {
+						// 	$pass--;
+						// 	$solution = $objQuestion->getExportSolution($active_id, $pass);
+						// }
 
+						if (!isset($solution["solution_id"])) continue;
+
+						$code = $objQuestion->getCompleteSource($solution);
+						$blocks = $objQuestion->blocks()->getCombinedBlocks($solution['value2'], true, $solution['value1']);
+											
 						$subFolder = $this->createCommentFile(
 							$zip, $userdata, $questionBase, 
 							$objQuestion, $active_id, $pass, $solution);
@@ -369,17 +378,14 @@ class ilCodeQuestionScoreIntegration
 						$zip->addFromString($subFolder.'/'.$filename, $code);
 
 						//generate files for each block
-						$studentCode = $objQuestion->prepareSolutionData($solution);
-						for ($i=0; $i<$objQuestion->getNumberOfBlocks(); $i++){
-							$t = $objQuestion->getTypeForBlock($i);							
+						for ($i=0; $i<count($blocks); $i++){
+							$t = $objQuestion->blocks()[$i]->getType();							
 							if ($t == assCodeQuestionBlockTypes::SolutionCode) {
-								$c = '';
-								if (!empty($studentCode)) $c = $studentCode->$i;
-								$zip->addFromString($subFolder.'/'.$i.'.solution.'.$filename, $c);
+								$zip->addFromString($subFolder.'/'.$i.'.solution.'.$filename, $blocks[$i]);
 							} else if ($t == assCodeQuestionBlockTypes::StaticCode) {
-								$zip->addFromString($subFolder.'/'.$i.'.static.'.$filename, $objQuestion->getContentForBlock($i));
+								$zip->addFromString($subFolder.'/'.$i.'.static.'.$filename, $blocks[$i]);
 							} else if ($t == assCodeQuestionBlockTypes::HiddenCode) {
-								$zip->addFromString($subFolder.'/'.$i.'.hidden.'.$filename, $objQuestion->getContentForBlock($i));	
+								$zip->addFromString($subFolder.'/'.$i.'.hidden.'.$filename, $blocks[$i]);
 							}								
 						}
 					}
@@ -387,6 +393,7 @@ class ilCodeQuestionScoreIntegration
 				// Access some user related properties
 				//$last_visited = $data->getParticipant($active_id)->getLastVisit();
 		}
+
 		$zip->close();
 
 		return NULL;
@@ -530,13 +537,13 @@ class ilCodeQuestionScoreIntegration
 		return NULL;
 	}
 	protected function buildCode($objQuestion, $solution) {
-		$studentCode = $objQuestion->prepareSolutionData($solution);
+		$blocks = $objQuestion->blocks()->getCombinedBlocks($solution['value2'], true, $solution['value1']);		
 	
 		$res = '';
 		$justCode = '';
 		$line = 1;
-		for ($i=0; $i<$objQuestion->getNumberOfBlocks(); $i++){
-			$t = $objQuestion->getTypeForBlock($i);
+		for ($i=0; $i<count($blocks); $i++){
+			$t = $objQuestion->blocks()[$i]->getType();
 			if ($t == assCodeQuestionBlockTypes::SolutionCode) {
 				$res .= '\\begin{lstlisting}[firstnumber='.$line.', frame=single]'."\n";						
 				if (!empty($studentCode)){
@@ -546,8 +553,8 @@ class ilCodeQuestionScoreIntegration
 				$res .= '\\end{lstlisting}'."\n";			
 			} else if ($t == assCodeQuestionBlockTypes::StaticCode || $t== assCodeQuestionBlockTypes::HiddenCode) {
 				$res .= '\\begin{lstlisting}[firstnumber='.$line.', basicstyle=\\linespread{0.8}\\sffamily]'."\n";				
-				$res .= $objQuestion->getContentForBlock($i)."\n";
-				$justCode .= $objQuestion->getContentForBlock($i)."\n";
+				$res .= $blocks[$i]."\n";
+				$justCode .= $blocks[$i]."\n";
 				$res .= '\\end{lstlisting}'."\n";
 			}
 

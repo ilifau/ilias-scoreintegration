@@ -386,10 +386,10 @@ class ilCodeQuestionScoreIntegrationPageGUI
 		}
 
 		if ($latex) {
-			$zipFile  = tempnam(sys_get_temp_dir(), 'Latex_');
+			$zipFile  = tempnam(sys_get_temp_dir(), 'Latex_').".zip";
 			$err = $this->estObj->buildLatexZIP($zipFile);
 		} else {
-			$zipFile  = tempnam(sys_get_temp_dir(), 'EST_');
+			$zipFile  = tempnam(sys_get_temp_dir(), 'EST_').".zip";
 			$err = $this->estObj->buildZIP($zipFile);
 		}
 

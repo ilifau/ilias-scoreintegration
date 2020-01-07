@@ -32,6 +32,8 @@ CodeQuestionScoreIntegration` directory to your ILIAS installation at the follow
 There is nothing to configure for this plugin.
 
 ## Version History
+### Version 1.2.0
+* Support for new CodeQuestion Structure form the 1.2.x series
 ### Version 1.0.3
 * Bugfix for ordering export
 ### Version 1.0.2
