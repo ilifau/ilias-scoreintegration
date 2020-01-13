@@ -381,11 +381,11 @@ class ilCodeQuestionScoreIntegration
 						for ($i=0; $i<count($blocks); $i++){
 							$t = $objQuestion->blocks()[$i]->getType();							
 							if ($t == assCodeQuestionBlockTypes::SolutionCode) {
-								$zip->addFromString($subFolder.'/'.$i.'.solution.'.$filename, $blocks[$i]);
+								$zip->addFromString($subFolder.'/'.$i.'.solution.'.$filename, CodeBlock::fixExportedCode($blocks[$i]));
 							} else if ($t == assCodeQuestionBlockTypes::StaticCode) {
-								$zip->addFromString($subFolder.'/'.$i.'.static.'.$filename, $blocks[$i]);
+								$zip->addFromString($subFolder.'/'.$i.'.static.'.$filename, CodeBlock::fixExportedCode($blocks[$i]));
 							} else if ($t == assCodeQuestionBlockTypes::HiddenCode) {
-								$zip->addFromString($subFolder.'/'.$i.'.hidden.'.$filename, $blocks[$i]);
+								$zip->addFromString($subFolder.'/'.$i.'.hidden.'.$filename, CodeBlock::fixExportedCode($blocks[$i]));
 							}								
 						}
 					}
