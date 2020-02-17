@@ -313,6 +313,13 @@ class ilCodeQuestionScoreIntegration
 			}
 		}
 	}
+
+	function getRandomSet($objQuestion, $active_id, $pass){
+		$stored = $objQuestion->getSolutionValuesOrInit($active_id, $pass, true, false, false);
+		$rid = -1;
+		if (isset($stored['value2']) && isset($stored['value2']->rid)) $rid = $stored['value2']->rid;
+		return $objQuestion->blocks()->getRandomSet($rid);
+	}
 	
 	function buildZIP($zipFile){
 		$data      = $this->testObj->getCompleteEvaluationData(TRUE);
@@ -328,7 +335,9 @@ class ilCodeQuestionScoreIntegration
 		{			
 				// Do something with the participants				
 				$pass = $userdata->getScoredPass();
-				foreach($userdata->getQuestions($pass) as $question)
+				$questions = $userdata->getQuestions($pass);
+				if (!is_array($questions)) continue;
+				foreach($questions as $question)
 				{
 					$questionBase = $tempBase.'/'.sprintf("question-%06d", $question["id"]);					
 					$objQuestion = $questions[$question["id"]];
@@ -354,8 +363,9 @@ class ilCodeQuestionScoreIntegration
 					} else if (method_exists($objQuestion, 'getCompleteSource') && 
 						method_exists($objQuestion, 'getExportFilename') &&
 						method_exists($objQuestion, 'getExportSolution')){
-						$filename = $objQuestion->getExportFilename();
+						$base_filename = $objQuestion->getExportFilename(NULL);
 						$solution = $objQuestion->getExportSolution($active_id, $pass);
+						$filename = $objQuestion->getExportFilename($solution);
 												
 						//ignore invalid solution
 						if ($solution == null) continue;
@@ -368,7 +378,7 @@ class ilCodeQuestionScoreIntegration
 
 						if (!isset($solution["solution_id"])) continue;
 
-						$code = $objQuestion->getCompleteSource($solution);
+						$code = CodeBlock::fixExportedCode($objQuestion->getCompleteSource($solution));
 						$blocks = $objQuestion->blocks()->getCombinedBlocks($solution['value2'], true, $solution['value1']);
 											
 						$subFolder = $this->createCommentFile(
@@ -376,17 +386,25 @@ class ilCodeQuestionScoreIntegration
 							$objQuestion, $active_id, $pass, $solution);
 
 						$zip->addFromString($subFolder.'/'.$filename, $code);
+						
+						//we have the randomizer, so dump its values
+						if ($objQuestion->blocks()->getRandomizerActive()){
+							$set = $this->getRandomSet($objQuestion, $active_id, $pass);
+							if ($set != NULL) {
+								$zip->addFromString($subFolder.'/randomizer.json', json_encode($set));
+							}
+						}
 
 						//generate files for each block
 						for ($i=0; $i<count($blocks); $i++){
 							$t = $objQuestion->blocks()[$i]->getType();							
 							if ($t == assCodeQuestionBlockTypes::SolutionCode) {
-								$zip->addFromString($subFolder.'/'.$i.'.solution.'.$filename, CodeBlock::fixExportedCode($blocks[$i]));
+								$zip->addFromString($subFolder.'/'.$i.'.solution.'.$base_filename, CodeBlock::fixExportedCode($blocks[$i]));
 							} else if ($t == assCodeQuestionBlockTypes::StaticCode) {
-								$zip->addFromString($subFolder.'/'.$i.'.static.'.$filename, CodeBlock::fixExportedCode($blocks[$i]));
+								$zip->addFromString($subFolder.'/'.$i.'.static.'.$base_filename, CodeBlock::fixExportedCode($blocks[$i]));
 							} else if ($t == assCodeQuestionBlockTypes::HiddenCode) {
-								$zip->addFromString($subFolder.'/'.$i.'.hidden.'.$filename, CodeBlock::fixExportedCode($blocks[$i]));
-							}								
+								$zip->addFromString($subFolder.'/'.$i.'.hidden.'.$base_filename, CodeBlock::fixExportedCode($blocks[$i]));
+							}														
 						}
 					}
 				}
