@@ -328,7 +328,9 @@ class ilCodeQuestionScoreIntegration
 		{			
 				// Do something with the participants				
 				$pass = $userdata->getScoredPass();
-				foreach($userdata->getQuestions($pass) as $question)
+				$questions = $userdata->getQuestions($pass);
+				if (!is_array($questions)) continue;
+				foreach($questions as $question)
 				{
 					$questionBase = $tempBase.'/'.sprintf("question-%06d", $question["id"]);					
 					$objQuestion = $questions[$question["id"]];
