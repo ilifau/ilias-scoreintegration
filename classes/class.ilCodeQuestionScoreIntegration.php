@@ -313,6 +313,13 @@ class ilCodeQuestionScoreIntegration
 			}
 		}
 	}
+
+	function getRandomSet($objQuestion, $active_id, $pass){
+		$stored = $objQuestion->getSolutionValuesOrInit($active_id, $pass, true, false, false);
+		$rid = -1;
+		if (isset($stored['value2']) && isset($stored['value2']->rid)) $rid = $stored['value2']->rid;
+		return $objQuestion->blocks()->getRandomSet($rid);
+	}
 	
 	function buildZIP($zipFile){
 		$data      = $this->testObj->getCompleteEvaluationData(TRUE);
@@ -379,6 +386,14 @@ class ilCodeQuestionScoreIntegration
 							$objQuestion, $active_id, $pass, $solution);
 
 						$zip->addFromString($subFolder.'/'.$filename, $code);
+						
+						//we have the randomizer, so dump its values
+						if ($objQuestion->blocks()->getRandomizerActive()){
+							$set = $this->getRandomSet($objQuestion, $active_id, $pass);
+							if ($set != NULL) {
+								$zip->addFromString($subFolder.'/randomizer.json', json_encode($set));
+							}
+						}
 
 						//generate files for each block
 						for ($i=0; $i<count($blocks); $i++){
