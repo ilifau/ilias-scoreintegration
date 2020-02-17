@@ -356,8 +356,9 @@ class ilCodeQuestionScoreIntegration
 					} else if (method_exists($objQuestion, 'getCompleteSource') && 
 						method_exists($objQuestion, 'getExportFilename') &&
 						method_exists($objQuestion, 'getExportSolution')){
-						$filename = $objQuestion->getExportFilename();
+						$base_filename = $objQuestion->getExportFilename(NULL);
 						$solution = $objQuestion->getExportSolution($active_id, $pass);
+						$filename = $objQuestion->getExportFilename($solution);
 												
 						//ignore invalid solution
 						if ($solution == null) continue;
@@ -383,12 +384,12 @@ class ilCodeQuestionScoreIntegration
 						for ($i=0; $i<count($blocks); $i++){
 							$t = $objQuestion->blocks()[$i]->getType();							
 							if ($t == assCodeQuestionBlockTypes::SolutionCode) {
-								$zip->addFromString($subFolder.'/'.$i.'.solution.'.$filename, CodeBlock::fixExportedCode($blocks[$i]));
+								$zip->addFromString($subFolder.'/'.$i.'.solution.'.$base_filename, CodeBlock::fixExportedCode($blocks[$i]));
 							} else if ($t == assCodeQuestionBlockTypes::StaticCode) {
-								$zip->addFromString($subFolder.'/'.$i.'.static.'.$filename, CodeBlock::fixExportedCode($blocks[$i]));
+								$zip->addFromString($subFolder.'/'.$i.'.static.'.$base_filename, CodeBlock::fixExportedCode($blocks[$i]));
 							} else if ($t == assCodeQuestionBlockTypes::HiddenCode) {
-								$zip->addFromString($subFolder.'/'.$i.'.hidden.'.$filename, CodeBlock::fixExportedCode($blocks[$i]));
-							}								
+								$zip->addFromString($subFolder.'/'.$i.'.hidden.'.$base_filename, CodeBlock::fixExportedCode($blocks[$i]));
+							}														
 						}
 					}
 				}
