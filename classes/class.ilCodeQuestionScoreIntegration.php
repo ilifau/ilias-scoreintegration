@@ -370,7 +370,7 @@ class ilCodeQuestionScoreIntegration
 
 						if (!isset($solution["solution_id"])) continue;
 
-						$code = $objQuestion->getCompleteSource($solution);
+						$code = CodeBlock::fixExportedCode($objQuestion->getCompleteSource($solution));
 						$blocks = $objQuestion->blocks()->getCombinedBlocks($solution['value2'], true, $solution['value1']);
 											
 						$subFolder = $this->createCommentFile(
