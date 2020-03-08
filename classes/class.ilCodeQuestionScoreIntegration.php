@@ -395,6 +395,13 @@ class ilCodeQuestionScoreIntegration
 							}
 						}
 
+						//dump a solution html rendering for the VSCode Extension
+						{
+							$solutions = $objQuestion->getSolutionValuesOrInit($active_id, $pass, true, false, false);
+							$html = $objQuestion->blocks()->ui()->render(false, false, true, $solution['value1'], $solution['value2']);
+							$zip->addFromString($subFolder.'/rendered.html', $html);
+						}
+
 						//generate files for each block
 						for ($i=0; $i<count($blocks); $i++){
 							$t = $objQuestion->blocks()[$i]->getType();							
