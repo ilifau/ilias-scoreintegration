@@ -402,6 +402,12 @@ class ilCodeQuestionScoreIntegration
 							$zip->addFromString($subFolder.'/rendered.html', $html);
 						}
 
+                        //add the question-text and other meta info to download
+						{
+                            $info = ['title'=>$objQuestion->title, 'hint'=>$objQuestion->comment, 'description'=>$objQuestion->question];
+							$zip->addFromString($subFolder.'/meta.json', json_encode($info));
+						}
+
 						//generate files for each block
 						for ($i=0; $i<count($blocks); $i++){
 							$t = $objQuestion->blocks()[$i]->getType();							
