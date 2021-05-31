@@ -320,6 +320,24 @@ class ilCodeQuestionScoreIntegration
 		if (isset($stored['value2']) && isset($stored['value2']->rid)) $rid = $stored['value2']->rid;
 		return $objQuestion->blocks()->getRandomSet($rid);
 	}
+
+    function justAnswers($objQuestion, $solution){
+        if (method_exists($objQuestion, 'getJustAnswers')){
+            return $objQuestion->getJustAnswers($solution);
+        }
+        $blocks = $objQuestion->blocks->getCombinedBlocks($solution['value2'], true, $solution['value1']);
+	
+		$res = '';
+		for ($i=0; $i<count($blocks); $i++){
+			$t = $objQuestion->blocks[$i]->getType();
+			if ($t == assCodeQuestionBlockTypes::SolutionCode) {
+				if (isset($blocks[$i])){
+					$res .= $blocks[$i]."\n";
+				}				
+			} 
+		}
+		return $res;
+    }
 	
 	function buildZIP($zipFile){
 		$data      = $this->testObj->getCompleteEvaluationData(TRUE);
@@ -330,13 +348,17 @@ class ilCodeQuestionScoreIntegration
 		}
 
 		$tempBase = sprintf('./EST/test-%06d', $this->testObj->getId());
-		
+        $ignoreEmpty = $_POST['ignoreEmpty']==1;
+        $autoFileName = $_POST['autoFileName']==1;
 		foreach($data->getParticipants() as $active_id => $userdata)
 		{			
+                
 				// Do something with the participants				
 				$pass = $userdata->getScoredPass();
+                $opass = $pass;
 				$questions = $userdata->getQuestions($pass);
-				if (!is_array($questions)) continue;
+
+                if (!is_array($questions)) continue;
 				foreach($questions as $question)
 				{
 					$questionBase = $tempBase.'/'.sprintf("question-%06d", $question["id"]);					
@@ -363,18 +385,36 @@ class ilCodeQuestionScoreIntegration
 					} else if (method_exists($objQuestion, 'getCompleteSource') && 
 						method_exists($objQuestion, 'getExportFilename') &&
 						method_exists($objQuestion, 'getExportSolution')){
-						$base_filename = $objQuestion->getExportFilename(NULL);
+
+                        $base_filename = $autoFileName?$objQuestion->getExportFilename(NULL):("Solution.".$objQuestion->getExportExtension());
+                        
 						$solution = $objQuestion->getExportSolution($active_id, $pass);
-						$filename = $objQuestion->getExportFilename($solution);
+						$osolution = $solution;
 												
 						//ignore invalid solution
 						if ($solution == null) continue;
 
-						// //the latest pass has no data, find one that has...
-						// while ((!isset($solution["solution_id"])) && $pass>0) {
-						// 	$pass--;
-						// 	$solution = $objQuestion->getExportSolution($active_id, $pass);
-						// }
+                        if ($ignoreEmpty){
+                            $rerun = true;
+                            while ($pass > 0 && $rerun) {
+                                $studentCode = trim($this->justAnswers($objQuestion, $solution));
+                                $emptyCode = trim($this->justAnswers($objQuestion, NULL));
+                                //echo ":".$studentCode." ".$pass.":<br>:".$emptyCode.":<br>";                                
+                                if (($studentCode == $emptyCode || $studentCode=='') && $pass>0){
+                                    $pass--;
+                                    $solution = $objQuestion->getExportSolution($active_id, $pass);
+                                    if ($solution == null) {
+                                        $solution = $osolution;                                
+                                    }
+                                } else {
+                                    $rerun = false;
+                                }
+                            }
+                        }
+                        
+                        $filename = $autoFileName?$objQuestion->getExportFilename($solution):("Solution.".$objQuestion->getExportExtension());
+                        // echo $filename ." - ".$opass . " - " .$pass;
+                        // die;					
 
 						if (!isset($solution["solution_id"])) continue;
 

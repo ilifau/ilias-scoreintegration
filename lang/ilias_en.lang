@@ -35,3 +35,5 @@ title#:#Auto Score Integration
 h_nr_participants#:#Number of Participants
 log_import_score#:#%s imported the score %s points for participant %s and question %s.
 log_recalculated_solutions#:#Die Testergebnisse wurden neu berechnet.
+ignore_empty#:#Ignore empty passes
+use_auto_file#:#utomatically find filename for Solution

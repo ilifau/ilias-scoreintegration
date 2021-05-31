@@ -343,6 +343,8 @@ class ilCodeQuestionScoreIntegrationPageGUI
 		$tpl->setVariable('DNL_TEX', $this->plugin->txt('lnk_tex'));
 		$tpl->setVariable('H_UPLOAD', $this->plugin->txt('h_upload'));
 		$tpl->setVariable('TXT_UPLOAD', $this->plugin->txt('html_upload'));
+        $tpl->setVariable('IGNORE_EMPTY_TEXT', $this->plugin->txt('ignore_empty'));
+        $tpl->setVariable('USE_AUTO_FILE', $this->plugin->txt('use_auto_file'));
 		return $tpl;
 	}
 
