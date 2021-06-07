@@ -143,6 +143,14 @@ class ilCodeQuestionScoreIntegrationPageGUI
 		$item = new ilCustomInputGUI($this->plugin->txt('archive_file'));		
 		$item->setHTML('<input type="file" id="upload_files" name="upload_files">');
 		$form->addItem($item);	
+
+        $passOverride = new ilCheckboxInputGUI($this->plugin->txt('pass_override'),'pass_override');		
+		$passOverride->setRequired(false);
+
+		$passOverride->setValue("ov");
+		$passOverride->setChecked(false);
+		$form->addItem($passOverride);
+
 		$form->addCommandButton('uploadFiles', $lng->txt('submit'));
 		return $form;
 	}

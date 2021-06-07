@@ -284,7 +284,12 @@ class ilCodeQuestionScoreIntegration
 
 	private function storeInfo(&$zipResults){
 		global $lng;
-
+        $passOverride = $_POST['pass_override'] == 'ov';
+        $data = [];
+        if ($passOverride){
+            $data = $this->testObj->getCompleteEvaluationData(TRUE);
+        }
+        
 		foreach($zipResults['files'] as &$obj){
 			$objQuestion = $questions[$obj["questionID"]];
 			if (!$objQuestion){
@@ -292,6 +297,11 @@ class ilCodeQuestionScoreIntegration
 				$questions[$obj["questionID"]] = $objQuestion;
 			}
 			$solution = null;
+            $pointPass = $solution['pass'];
+            if ($passOverride){                
+                $userInfo = $data->getParticipant($obj["activeID"]);
+                $pointPass = $userInfo->getScoredPass();                
+            }
 			if (method_exists($objQuestion, 'getExportSolution') ){
 				$solution = $objQuestion->getExportSolution($obj["activeID"], $obj["pass"]);
 			} else {
@@ -302,8 +312,13 @@ class ilCodeQuestionScoreIntegration
 				if ($solution['solution_id'] == $obj["solutionID"] && 
 					$solution['active_fi'] == $obj["activeID"] &&
 					$solution['question_fi'] == $obj["questionID"] &&
-					$solution['pass'] == $obj["pass"] ){
+					$solution['pass'] == $obj["pass"] ){                        
 						$this->updatePoints($obj["activeID"], $obj["questionID"], $obj["pass"], $obj["points"], $objQuestion->getPoints(), $obj["comment"]);
+                        
+                        if ($obj["pass"] != $pointPass){
+                            $cmt = '['.$this->plugin->txt('pass_override_label').': '.($obj["pass"]+1).']\n\n'.$obj["comment"];                            
+                            $this->updatePoints($obj["activeID"], $obj["questionID"], $pointPass, $obj["points"], $objQuestion->getPoints(), $cmt);
+                        }
 						$obj['stored'] = true;
 				} else {
 					$obj['error'] = $this->plugin->txt('error_inconsistent_id');
@@ -321,9 +336,9 @@ class ilCodeQuestionScoreIntegration
 		return $objQuestion->blocks()->getRandomSet($rid);
 	}
 
-    function justAnswers($objQuestion, $solution){
+    function justAnswers($objQuestion, $solution, $trimall=false){
         if (method_exists($objQuestion, 'getJustAnswers')){
-            return $objQuestion->getJustAnswers($solution);
+            return $objQuestion->getJustAnswers($solution, $trimall);
         }
         $blocks = $objQuestion->blocks->getCombinedBlocks($solution['value2'], true, $solution['value1']);
 	
@@ -332,7 +347,11 @@ class ilCodeQuestionScoreIntegration
 			$t = $objQuestion->blocks[$i]->getType();
 			if ($t == assCodeQuestionBlockTypes::SolutionCode) {
 				if (isset($blocks[$i])){
-					$res .= $blocks[$i]."\n";
+					if ($trimall){
+                        $res .= trim($blocks[$i])."\n"; 
+                    } else {
+                        $res .= $blocks[$i]."\n";
+                    }
 				}				
 			} 
 		}
@@ -397,8 +416,8 @@ class ilCodeQuestionScoreIntegration
                         if ($ignoreEmpty){
                             $rerun = true;
                             while ($pass > 0 && $rerun) {
-                                $studentCode = trim($this->justAnswers($objQuestion, $solution));
-                                $emptyCode = trim($this->justAnswers($objQuestion, NULL));
+                                $studentCode = trim($this->justAnswers($objQuestion, $solution, true));
+                                $emptyCode = trim($this->justAnswers($objQuestion, NULL, true));
                                 //echo ":".$studentCode." ".$pass.":<br>:".$emptyCode.":<br>";                                
                                 if (($studentCode == $emptyCode || $studentCode=='') && $pass>0){
                                     $pass--;

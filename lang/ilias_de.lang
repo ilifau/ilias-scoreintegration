@@ -37,3 +37,5 @@ log_import_score#:#%s hat die Bewertung %s Punkte für den Teilnehmer %s und die
 log_recalculated_solutions#:#Die Testergebnisse wurden neu berechnet.
 ignore_empty#:#Unbearbeitete Durchläufe ignorieren
 use_auto_file#:#Dateiname für Lösungdatei automatisch bestimmen.
+pass_override#:#Ergebnisse immer in den letzten Durchgang einfügen.
+pass_override_label#:#Korrigierter Durchgang
