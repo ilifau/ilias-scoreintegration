@@ -74,12 +74,12 @@ class ilCodeQuestionScoreIntegrationPageGUI
 			case 'uploadFiles':			
 				$this->prepareOutput();
 				$this->tpl->setContent($this->uploadFiles());
-				$this->tpl->show();
+                $this->tpl->printToStdout();
 				break;
 			case 'showMainAutoScorePage':
 				$this->prepareOutput();
 				$this->tpl->setContent($this->overviewContent());
-				$this->tpl->show();
+                $this->tpl->printToStdout();
 			break;
 			case 'zip':
 				$this->sendZIP(FALSE);
@@ -374,7 +374,7 @@ class ilCodeQuestionScoreIntegrationPageGUI
 		$ilLocator->addRepositoryItems($this->testObj->getRefId());
 		$ilLocator->addItem($this->testObj->getTitle(),$this->ctrl->getLinkTargetByClass('ilObjTestGUI'));
 
-		$this->tpl->getStandardTemplate();
+		//$this->tpl->getStandardTemplate();
 		$this->tpl->setLocator();
 		$this->tpl->setTitle($this->testObj->getPresentationTitle());
 		$this->tpl->setDescription($this->testObj->getLongDescription());
