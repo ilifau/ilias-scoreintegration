@@ -4,9 +4,9 @@
 
 **Version**:  1.0.3
 
-**Company**:  Computer Graphics Group Erlangen
+**Company**:  Friedrich-Alexander-Universität, Computer Graphics Group
 
-**Supports**: ILIAS 5.1 - 5.3
+**Supports**: ILIAS 7
 
 ## License
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
@@ -32,6 +32,8 @@ CodeQuestionScoreIntegration` directory to your ILIAS installation at the follow
 There is nothing to configure for this plugin.
 
 ## Version History
+### Version 1.2.3
+* Moved Plugin Code to Ilias 7
 ### Version 1.2.0
 * Support for new CodeQuestion Structure form the 1.2.x series
 ### Version 1.0.3
