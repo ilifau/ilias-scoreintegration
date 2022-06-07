@@ -144,10 +144,15 @@ class ilCodeQuestionScoreIntegrationPageGUI
 		$item->setHTML('<input type="file" id="upload_files" name="upload_files">');
 		$form->addItem($item);	
 
+        $set_scored = new ilCheckboxInputGUI($lng->txt('set_manscoring_done'), 'set_manscoring_done');
+        $set_scored->setValue('set');
+        $set_scored->setChecked(true);
+        $form->addItem($set_scored);
+
         $passOverride = new ilCheckboxInputGUI($this->plugin->txt('pass_override'),'pass_override');		
 		$passOverride->setRequired(false);
 
-		$passOverride->setValue("ov");
+		$passOverride->setValue('ov');
 		$passOverride->setChecked(false);
 		$form->addItem($passOverride);
 

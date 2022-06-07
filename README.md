@@ -2,7 +2,7 @@
 
 **Author**:   Frank Bauer <frank.bauer@fau.de>
 
-**Version**:  1.2.3
+**Version**:  1.3.0
 
 **Company**:  Friedrich-Alexander-Universität, Visual Computing
 
@@ -32,6 +32,9 @@ CodeQuestionScoreIntegration` directory to your ILIAS installation at the follow
 There is nothing to configure for this plugin.
 
 ## Version History
+### Version 1.3.0
+* Export Cloze Solutions
+* Add Checkbox to aut mark the uploaded manual scoring result as finished
 ### Version 1.2.3
 * Moved Plugin Code to Ilias 7
 ### Version 1.2.0
