@@ -2,9 +2,9 @@
 
 **Author**:   Frank Bauer <frank.bauer@fau.de>
 
-**Version**:  1.0.3
+**Version**:  1.2.3
 
-**Company**:  Friedrich-Alexander-Universität, Computer Graphics Group
+**Company**:  Friedrich-Alexander-Universität, Visual Computing
 
 **Supports**: ILIAS 7
 
