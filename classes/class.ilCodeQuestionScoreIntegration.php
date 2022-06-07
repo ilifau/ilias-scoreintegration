@@ -88,13 +88,16 @@ class ilCodeQuestionScoreIntegration
 //			1, $this->testObj->areObligationsEnabled()
 //		);
 
+        $setManScoringDone = $_POST['set_manscoring_done'] == 'set';
+
 		self::_setReachedPointsOnly(
 			$active_fi,
 			$question_fi,
 			$reachedPoints,
 			$maxPoints,
 			$pass,
-			1, $this->testObj->areObligationsEnabled()
+			1, 
+            $this->testObj->areObligationsEnabled()
 		);
 
 		global $ilUser;
@@ -123,6 +126,10 @@ class ilCodeQuestionScoreIntegration
 			);
 		}
 
+        if ($setManScoringDone){
+            ilTestService::setManScoringDone($active_fi, true);
+        }
+
 
 // fred: In StudOn this is done in recalculateSolutions (patched)
 //
@@ -146,7 +153,7 @@ class ilCodeQuestionScoreIntegration
 	 * @return boolean true on success, otherwise false
 	 * @access public
 	 */
-	protected static function _setReachedPointsOnly($active_id, $question_id, $points, $maxpoints, $pass, $manualscoring, $obligationsEnabled)
+	protected static function _setReachedPointsOnly($active_id, $question_id, $points, $maxpoints, $pass, $isManualScoring, $obligationsEnabled)
 	{
 		global $ilDB;
 
@@ -163,7 +170,7 @@ class ilCodeQuestionScoreIntegration
 				array('integer','integer','integer'),
 				array($active_id, $question_id, $pass)
 			);
-			$manual = ($manualscoring) ? 1 : 0;
+			$manual = ($isManualScoring) ? 1 : 0;
 			$rowsnum = $result->numRows();
 			if($rowsnum)
 			{
