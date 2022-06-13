@@ -88,13 +88,16 @@ class ilCodeQuestionScoreIntegration
 //			1, $this->testObj->areObligationsEnabled()
 //		);
 
+        $setManScoringDone = $_POST['set_manscoring_done'] == 'set';
+
 		self::_setReachedPointsOnly(
 			$active_fi,
 			$question_fi,
 			$reachedPoints,
 			$maxPoints,
 			$pass,
-			1, $this->testObj->areObligationsEnabled()
+			1, 
+            $this->testObj->areObligationsEnabled()
 		);
 
 		global $ilUser;
@@ -123,6 +126,10 @@ class ilCodeQuestionScoreIntegration
 			);
 		}
 
+        if ($setManScoringDone){
+            ilTestService::setManScoringDone($active_fi, true);
+        }
+
 
 // fred: In StudOn this is done in recalculateSolutions (patched)
 //
@@ -146,7 +153,7 @@ class ilCodeQuestionScoreIntegration
 	 * @return boolean true on success, otherwise false
 	 * @access public
 	 */
-	protected static function _setReachedPointsOnly($active_id, $question_id, $points, $maxpoints, $pass, $manualscoring, $obligationsEnabled)
+	protected static function _setReachedPointsOnly($active_id, $question_id, $points, $maxpoints, $pass, $isManualScoring, $obligationsEnabled)
 	{
 		global $ilDB;
 
@@ -163,7 +170,7 @@ class ilCodeQuestionScoreIntegration
 				array('integer','integer','integer'),
 				array($active_id, $question_id, $pass)
 			);
-			$manual = ($manualscoring) ? 1 : 0;
+			$manual = ($isManualScoring) ? 1 : 0;
 			$rowsnum = $result->numRows();
 			if($rowsnum)
 			{
@@ -386,7 +393,15 @@ class ilCodeQuestionScoreIntegration
 						$objQuestion = $this->testObj->_instanciateQuestion($question["id"]);
 						$questions[$question["id"]] = $objQuestion;
 					}
-					if (method_exists($objQuestion, 'getOrderingElements')){							
+                    if (method_exists($objQuestion, 'getClozeText')){							
+						$res = $this->jsonFromClozeQuestion( $objQuestion, $active_id, $pass );														
+						$subFolder = $this->createCommentFile(
+							$zip, $userdata, $questionBase, 
+							$objQuestion, $active_id, $pass, null);
+
+						$zip->addFromString($subFolder.'/cloze.json', $res['input'].'');
+                        $zip->addFromString($subFolder.'/answer.json', $res['sol'].'');
+					} else if (method_exists($objQuestion, 'getOrderingElements')){							
 						$json = $this->jsonFromHorizOrderingQuestion( $objQuestion, $active_id, $pass );														
 						$subFolder = $this->createCommentFile(
 							$zip, $userdata, $questionBase, 
@@ -488,6 +503,59 @@ class ilCodeQuestionScoreIntegration
 
 		return NULL;
 	}
+
+    protected function getNumericValueFromText($text)
+    {
+        include_once("./Services/Math/classes/class.EvalMath.php");
+        $eval = new EvalMath();
+        $eval->suppress_errors = true;
+        return $eval->e(str_replace(",", ".", ilUtil::stripSlashes($text, false)));
+    }
+    protected function jsonFromClozeQuestion($objQuestion, $active_id, $pass){
+        $input = [];
+        $input['gaps'] = [];
+        for ($i=0; $i<$objQuestion->getGapCount(); $i++){
+            $data = [];
+            
+            $gap = $objQuestion->getGap($i);
+            //assAnswerCloze
+
+            $data['type'] = $gap->getType();
+            $data['shuffle'] = $gap->getShuffle();
+            $data['items'] = [];
+            $data['id'] = $i+1;
+            foreach ($gap->getItemsRaw() as $nr => $item){
+                $d = [];
+                $d['order'] = 0+$item->getOrder();
+                $d['points'] = 0+$item->getPoints();
+                $d['size'] = $item->getGapSize();
+                if ($data['type'] == 2) {
+                    $d["lower"] = 0+$item->getLowerBound();
+                    $d["upper"] = 0+$item->getUpperBound();
+                    $d["value"] = 0+$this->getNumericValueFromText($item->getAnswertext());
+                } else {
+
+                $d['text'] = $item->getAnswertext();
+                }
+                
+                $data['items'][] = $d;                
+            }
+            $input['gaps'][] = $data;            
+        }
+        $input["text"] =  $objQuestion->getClozeText();
+
+        $results = [];
+        $solution = $objQuestion->getUserQuestionResult($active_id, $pass);        
+        foreach ($solution->getSolutions() as $key => $value) {            
+            $d = [];
+            $d['id'] = $value["key"];
+            $d['value'] = $value["value"];
+            $results[] = $d;
+        }
+        
+        return ["input"=>json_encode($input), "sol"=>json_encode($results)];
+    }
+
 	protected function jsonFromHorizOrderingQuestion($objQuestion, $active_id, $pass){
 		$soll = $objQuestion->getOrderingElements();
 		$ist = array();
